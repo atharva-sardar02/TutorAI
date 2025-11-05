@@ -864,3 +864,6 @@ export {
 export { verifyCaptcha } from './fraud/captchaHandler';
 export { approveFraudItem, rejectFraudItem } from './fraud/fraudQueue';
 
+// PR31: Compliance & DSR
+export { exportUserDataEndpoint, deleteUserAccountEndpoint } from './compliance/dsrHandler';
+

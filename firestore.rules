@@ -573,6 +573,24 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // --- COMPLIANCE & DSR (PR31) ---
+    // Data Subject Rights, compliance audit trail
+    
+    match /dsr_requests/{requestId} {
+      // Users can read their own DSR requests
+      allow read: if request.auth != null && 
+        (request.auth.uid == resource.data.userId || request.auth.token.admin == true);
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+    
+    match /scheduled_deletions/{deletionId} {
+      // Only admins can read
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
     // NOTE: Cloud Functions using admin SDK bypass all security rules
     // This allows server-side logic to write to any collection securely
   }
