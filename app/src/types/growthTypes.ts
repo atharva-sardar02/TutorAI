@@ -103,6 +103,12 @@ export interface GrowthFeatureFlags {
   leaderboards: {              // PR27 - Mini-Leaderboards
     enabled: boolean;
   };
+  fraud: {                     // PR22 - Fraud Detection
+    detectionEnabled: boolean;
+    captchaEnabled: boolean;
+    autoBlockThreshold: number;
+    captchaThreshold: number;
+  };
   loops: {
     tutorCard: { enabled: boolean };          // PR18
     progressReel: { enabled: boolean };       // PR19

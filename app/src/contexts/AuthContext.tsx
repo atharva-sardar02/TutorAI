@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from 'firebase/auth';
+import { User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import type { User } from '@/types';
 
 interface AuthContextType {
   user: User | null;
@@ -16,7 +17,7 @@ const AuthContext = createContext<AuthContextType>({ user: null, loading: true }
  * This is called whenever auth state changes to make sure the Firestore
  * document exists for presence, profile, etc.
  */
-async function ensureUserDocument(user: User) {
+async function ensureUserDocument(user: FirebaseUser) {
   try {
     const userRef = doc(db, 'users', user.uid);
     const userDoc = await getDoc(userRef);
@@ -69,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Ensure user document exists in Firestore
         await ensureUserDocument(user);
         
-        // Verify we can read the document back
+        // Fetch the full user document from Firestore
         try {
           const userRef = doc(db, 'users', user.uid);
           const userDoc = await getDoc(userRef);
@@ -77,14 +78,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             exists: userDoc.exists(),
             data: userDoc.data(),
           });
+          
+          if (userDoc.exists()) {
+            setUser(userDoc.data() as User);
+          } else {
+            setUser(null);
+          }
         } catch (error: any) {
           console.error('❌ Failed to read user document:', error);
           console.error('Error code:', error.code);
           console.error('Error message:', error.message);
+          setUser(null);
         }
+      } else {
+        setUser(null);
       }
       
-      setUser(user);
       setLoading(false);
     });
 
