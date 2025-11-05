@@ -406,13 +406,6 @@
       "collectionGroup": "daily",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "date", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "daily",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
         { "fieldPath": "conversationId", "order": "ASCENDING" },
         { "fieldPath": "date", "order": "ASCENDING" }
       ]
@@ -450,10 +443,27 @@
       ]
     },
     {
-      "collectionGroup": "recordings",
-      "queryScope": "COLLECTION_GROUP",
+      "collectionGroup": "fraud_queue",
+      "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "uploadedAt", "order": "ASCENDING" }
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "fraud_queue",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "loopType", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "fraud_queue",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "anomalyScore", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     }
   ],
