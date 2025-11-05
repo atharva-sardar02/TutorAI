@@ -95,6 +95,7 @@ export interface User {
   
   // Role system for tutor-parent communication
   role?: 'tutor' | 'parent';
+  userType?: 'tutor' | 'parent'; // Alias for role (used in PR30)
   tutorCode?: string; // Only for tutors (e.g., "TUT-A3F9B") - also stored in /tutorCodes/{code}
   linkedTutorIds?: string[]; // Only for parents - array of tutor UIDs
   subjects?: string[]; // Only for tutors (e.g., ["Math", "Physics"])

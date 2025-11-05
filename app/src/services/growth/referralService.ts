@@ -107,7 +107,7 @@ export async function handleDeepLink(url: string): Promise<void> {
       });
       
       // Track click event
-      await trackReferralClick(context);
+      await trackReferralClickInternal(context);
     } else {
       console.warn('⚠️ Invalid referral link format:', { referralId, signature, loopType });
     }
@@ -119,7 +119,7 @@ export async function handleDeepLink(url: string): Promise<void> {
  * 
  * Sends click event to backend for attribution tracking
  */
-async function trackReferralClick(context: ReferralContext): Promise<void> {
+async function trackReferralClickInternal(context: ReferralContext): Promise<void> {
   try {
     const trackFn = httpsCallable<TrackReferralClickRequest, { success: boolean }>(
       functions,
@@ -142,6 +142,49 @@ async function trackReferralClick(context: ReferralContext): Promise<void> {
     
     console.log('✅ Referral click tracked:', {
       referralId: context.referralId.substring(0, 8),
+    });
+  } catch (error: any) {
+    console.error('❌ Failed to track referral click:', error.message);
+    // Don't throw - allow app to continue even if tracking fails
+  }
+}
+
+/**
+ * Track referral click (public export for deep link handlers)
+ * 
+ * @param referralId - Referral ID from URL
+ * @param loopType - Type of viral loop
+ * @param metadata - Additional metadata (optional)
+ */
+export async function trackReferralClick(
+  referralId: string,
+  loopType: string,
+  metadata: Record<string, any>
+): Promise<void> {
+  try {
+    const trackFn = httpsCallable<TrackReferralClickRequest, { success: boolean }>(
+      functions,
+      'trackReferralClick'
+    );
+    
+    // Collect device hints for fraud detection
+    const deviceHints = {
+      deviceId: Device.osBuildId || Device.modelId || 'unknown',
+      userAgent: `${Device.osName}/${Device.osVersion}`,
+      platform: Device.osName?.toLowerCase().includes('ios') ? 'ios' as const : 'android' as const,
+    };
+    
+    await trackFn({
+      referralId,
+      loopType,
+      signature: '', // Not needed for non-link clicks
+      deviceHints,
+      ...metadata,
+    });
+    
+    console.log('✅ Referral click tracked:', {
+      referralId: referralId.substring(0, 8),
+      loopType,
     });
   } catch (error: any) {
     console.error('❌ Failed to track referral click:', error.message);

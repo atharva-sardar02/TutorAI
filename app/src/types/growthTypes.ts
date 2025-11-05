@@ -619,6 +619,8 @@ export interface ProgressReelData {
   reelId: string;
   userId: string;
   sessionId: string;
+  subject?: string;              // Subject of the session
+  topics?: string[];             // Topics covered
   highlights: string[];          // PII-redacted
   qualityScore: number;
   sentiment: 'positive' | 'neutral' | 'negative';

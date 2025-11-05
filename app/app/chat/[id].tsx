@@ -385,7 +385,7 @@ export default function ChatRoomScreen() {
           } catch (error) {
             console.warn('Scroll failed, retrying with scrollToIndex:', error);
             // Fallback to scrollToIndex if scrollToOffset fails
-            setTimeout(() => {
+            const timeout = setTimeout(() => {
               flashListRef.current?.scrollToIndex({ 
                 index: 0, 
                 animated: false,
