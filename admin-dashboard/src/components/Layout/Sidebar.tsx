@@ -57,13 +57,26 @@ const menuItems: MenuItem[] = [
   },
   { path: '/fraud', label: 'Fraud Detection', icon: <Security /> },
   { path: '/experiments', label: 'Experiments', icon: <Science /> },
-  { path: '/system', label: 'System & Health', icon: <Settings /> },
+  {
+    path: '/system',
+    label: 'System & Health',
+    icon: <Settings />,
+    subItems: [
+      { path: '/system', label: 'Health Dashboard' },
+      { path: '/system/kill-switches', label: 'Kill Switches' },
+      { path: '/system/users', label: 'User Management' },
+    ],
+  },
   { path: '/audit', label: 'Audit Log', icon: <Assessment /> },
 ];
 
 export function Sidebar() {
   const location = useLocation();
-  const [openItems, setOpenItems] = useState<Record<string, boolean>>({ '/growth': true });
+  const [openItems, setOpenItems] = useState<Record<string, boolean>>({ 
+    '/growth': true, 
+    '/session-intel': true,
+    '/system': true 
+  });
 
   const handleToggle = (path: string) => {
     setOpenItems((prev) => ({ ...prev, [path]: !prev[path] }));

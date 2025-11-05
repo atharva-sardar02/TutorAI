@@ -64,12 +64,13 @@ function SessionIntelPage() {
 import { FraudQueue } from './pages/Fraud/FraudQueue';
 import { ExperimentList } from './pages/Experiments/ExperimentList';
 
-function SystemPage() {
-  return <div style={{ padding: '20px' }}><h2>System & Health</h2><p>Coming soon in PR-ADMIN-06</p></div>;
-}
+// System pages
+import { KillSwitches } from './pages/System/KillSwitches';
+import { AuditLog } from './pages/System/AuditLog';
+import { SystemHealth } from './pages/System/SystemHealth';
 
-function AuditPage() {
-  return <div style={{ padding: '20px' }}><h2>Audit Log</h2><p>Coming soon in PR-ADMIN-06</p></div>;
+function UserManagementPage() {
+  return <div style={{ padding: '20px' }}><h2>User Management</h2><p>Coming soon</p></div>;
 }
 
 function App() {
@@ -209,7 +210,27 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MainLayout>
-                      <SystemPage />
+                      <SystemHealth />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system/kill-switches"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <KillSwitches />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/system/users"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <UserManagementPage />
                     </MainLayout>
                   </ProtectedRoute>
                 }
@@ -219,7 +240,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MainLayout>
-                      <AuditPage />
+                      <AuditLog />
                     </MainLayout>
                   </ProtectedRoute>
                 }
