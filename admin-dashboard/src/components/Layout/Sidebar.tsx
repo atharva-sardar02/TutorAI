@@ -45,7 +45,16 @@ const menuItems: MenuItem[] = [
       { path: '/growth/percentile', label: 'Percentile' },
     ],
   },
-  { path: '/session-intel', label: 'Session Intelligence', icon: <Psychology /> },
+  {
+    path: '/session-intel',
+    label: 'Session Intelligence',
+    icon: <Psychology />,
+    subItems: [
+      { path: '/session-intel/daily', label: 'Daily Summaries' },
+      { path: '/session-intel/weekly', label: 'Weekly Summaries' },
+      { path: '/session-intel/analytics', label: 'SI Analytics' },
+    ],
+  },
   { path: '/fraud', label: 'Fraud Detection', icon: <Security /> },
   { path: '/experiments', label: 'Experiments', icon: <Science /> },
   { path: '/system', label: 'System & Health', icon: <Settings /> },

@@ -41,8 +41,23 @@ function GrowthPage() {
   );
 }
 
+// Session Intelligence pages
+import { DailySummaries } from './pages/SessionIntel/DailySummaries';
+import { WeeklySummaries } from './pages/SessionIntel/WeeklySummaries';
+import { SIAnalytics } from './pages/SessionIntel/SIAnalytics';
+
 function SessionIntelPage() {
-  return <div style={{ padding: '20px' }}><h2>Session Intelligence</h2><p>Coming soon in PR-ADMIN-04</p></div>;
+  return (
+    <div style={{ padding: '20px' }}>
+      <h2>Session Intelligence Overview</h2>
+      <p>Select a section from the sidebar:</p>
+      <ul>
+        <li><a href="/session-intel/daily">Daily Summaries</a></li>
+        <li><a href="/session-intel/weekly">Weekly Summaries</a></li>
+        <li><a href="/session-intel/analytics">SI Analytics</a></li>
+      </ul>
+    </div>
+  );
 }
 
 function FraudPage() {
@@ -139,6 +154,36 @@ function App() {
                   <ProtectedRoute>
                     <MainLayout>
                       <SessionIntelPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/session-intel/daily"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <DailySummaries />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/session-intel/weekly"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <WeeklySummaries />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/session-intel/analytics"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <SIAnalytics />
                     </MainLayout>
                   </ProtectedRoute>
                 }

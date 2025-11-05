@@ -668,6 +668,26 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // --- SI_ANALYTICS COLLECTION (Admin Dashboard) ---
+    // Session Intelligence analytics events
+    match /si_analytics/{eventId} {
+      // Only admins can read
+      allow read: if isAdmin();
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- SI_ALERTS COLLECTION (Admin Dashboard) ---
+    // Session Intelligence alerts
+    match /si_alerts/{alertId} {
+      // Only admins can read
+      allow read: if isAdmin();
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
     // NOTE: Cloud Functions using admin SDK bypass all security rules
     // This allows server-side logic to write to any collection securely
   }
