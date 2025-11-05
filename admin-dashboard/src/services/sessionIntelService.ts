@@ -4,6 +4,7 @@ import type { DailySummary, WeeklySummary, SIEvent, SIAlert, SIAnalytics } from 
 
 /**
  * Fetch daily summaries with optional filters
+ * Now queries the aggregated admin_daily_summaries collection
  */
 export async function getDailySummaries(
   conversationId?: string,
@@ -12,40 +13,49 @@ export async function getDailySummaries(
   limitCount: number = 50
 ): Promise<DailySummary[]> {
   try {
-    // Note: The actual Firestore structure is /summaries/{cid}/daily/{dateStr}
-    // For admin dashboard, we'll just show mock data until we implement a proper aggregator
-    const snapshot = { empty: true, docs: [] } as any;
-    
-    if (snapshot.empty) {
-      // Return mock data
-      return [
-        {
-          id: 'daily_1',
-          conversationId: 'conv_123',
-          date: new Date().toISOString().split('T')[0],
-          messageCount: 25,
-          transcriptText: 'Student discussed quadratic equations...',
-          summary: 'Review of quadratic equations and factoring techniques.',
-          participants: ['user_tutor_1', 'user_parent_1'],
-          createdAt: Timestamp.now(),
-        },
-        {
-          id: 'daily_2',
-          conversationId: 'conv_124',
-          date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-          messageCount: 18,
-          transcriptText: 'Discussed essay writing structure...',
-          summary: 'Introduction to five-paragraph essay format.',
-          participants: ['user_tutor_2', 'user_parent_2'],
-          createdAt: Timestamp.fromDate(new Date(Date.now() - 86400000)),
-        },
-      ];
+    // Query the aggregated admin collection
+    let q = query(
+      collection(db, 'admin_daily_summaries'),
+      orderBy('date', 'desc'),
+      firestoreLimit(limitCount)
+    );
+
+    // Apply filters if provided
+    if (conversationId) {
+      q = query(q, where('conversationId', '==', conversationId));
     }
 
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as DailySummary[];
+    const snapshot = await getDocs(q);
+
+    let summaries = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        conversationId: data.conversationId,
+        date: data.date,
+        messageCount: data.messageCount || 0,
+        transcriptText: data.summary || '', // Use summary as transcript preview
+        summary: data.summary || '',
+        participants: data.participants || [],
+        createdAt: data.dateTimestamp || data.aggregatedAt || Timestamp.now(),
+        recordingCount: data.recordingCount,
+        topics: data.topics,
+        keywords: data.keywords,
+        sentiment: data.sentiment,
+      };
+    }) as DailySummary[];
+
+    // Client-side date filtering
+    if (startDate || endDate) {
+      summaries = summaries.filter(s => {
+        const summaryDate = new Date(s.date);
+        if (startDate && summaryDate < startDate) return false;
+        if (endDate && summaryDate > endDate) return false;
+        return true;
+      });
+    }
+
+    return summaries;
   } catch (error) {
     console.error('Error fetching daily summaries:', error);
     throw error;
@@ -54,41 +64,47 @@ export async function getDailySummaries(
 
 /**
  * Fetch weekly summaries
+ * Now queries the aggregated admin_weekly_summaries collection
  */
 export async function getWeeklySummaries(
   conversationId?: string,
   limitCount: number = 20
 ): Promise<WeeklySummary[]> {
   try {
-    // Note: The actual Firestore structure is /summaries/{cid}/weekly/{weekId}
-    // For admin dashboard, we'll just show mock data until we implement a proper aggregator
-    const snapshot = { empty: true, docs: [] } as any;
-    
-    if (snapshot.empty) {
-      // Return mock data
-      return [
-        {
-          id: 'weekly_1',
-          conversationId: 'conv_123',
-          weekId: '2025-W45',
-          weekStart: Timestamp.fromDate(new Date(Date.now() - 7 * 86400000)),
-          weekEnd: Timestamp.now(),
-          totalMessages: 120,
-          totalRecordings: 5,
-          keyTopics: ['Algebra', 'Quadratic Equations', 'Factoring'],
-          summary: 'Productive week covering quadratic equations with 5 tutoring sessions.',
-          reelGenerated: true,
-          reelId: 'reel_123',
-          participants: ['user_tutor_1', 'user_parent_1'],
-          createdAt: Timestamp.now(),
-        },
-      ];
+    // Query the aggregated admin collection
+    let q = query(
+      collection(db, 'admin_weekly_summaries'),
+      orderBy('startDate', 'desc'),
+      firestoreLimit(limitCount)
+    );
+
+    // Apply filter if provided
+    if (conversationId) {
+      q = query(q, where('conversationId', '==', conversationId));
     }
 
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as WeeklySummary[];
+    const snapshot = await getDocs(q);
+
+    const summaries = snapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        conversationId: data.conversationId,
+        weekId: data.week,
+        weekStart: data.startDate,
+        weekEnd: data.endDate,
+        totalMessages: data.totalMessages || 0,
+        totalRecordings: data.totalRecordings || 0,
+        keyTopics: data.topics || [],
+        summary: data.summary || '',
+        reelGenerated: data.reelGenerated || false,
+        reelId: data.reelId,
+        participants: data.participants || [],
+        createdAt: data.aggregatedAt || Timestamp.now(),
+      };
+    }) as WeeklySummary[];
+
+    return summaries;
   } catch (error) {
     console.error('Error fetching weekly summaries:', error);
     throw error;

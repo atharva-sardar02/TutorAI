@@ -473,6 +473,38 @@
         { "fieldPath": "loopType", "order": "ASCENDING" },
         { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "admin_daily_summaries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "date", "order": "DESCENDING" },
+        { "fieldPath": "conversationId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "admin_daily_summaries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "conversationId", "order": "ASCENDING" },
+        { "fieldPath": "date", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "admin_weekly_summaries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "startDate", "order": "DESCENDING" },
+        { "fieldPath": "conversationId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "admin_weekly_summaries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "conversationId", "order": "ASCENDING" },
+        { "fieldPath": "startDate", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

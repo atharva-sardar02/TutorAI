@@ -684,6 +684,24 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Admin Daily Summaries (PR-ADMIN-07)
+    match /admin_daily_summaries/{summaryId} {
+      // Only admins can read
+      allow read: if isAdmin();
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // Admin Weekly Summaries (PR-ADMIN-07)
+    match /admin_weekly_summaries/{summaryId} {
+      // Only admins can read
+      allow read: if isAdmin();
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
     // --- SI_ALERTS COLLECTION (Admin Dashboard) ---
     // Session Intelligence alerts
     match /si_alerts/{alertId} {

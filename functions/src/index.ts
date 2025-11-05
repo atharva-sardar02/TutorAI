@@ -742,6 +742,13 @@ export { transcribeSession } from './transcription/transcribeSession';
 export { transcribeRecording } from './si/transcribeRecording';
 
 /**
+ * Session Intelligence: Admin Summary Aggregator (PR-ADMIN-07)
+ * Scheduled function to aggregate daily/weekly summaries for admin dashboard
+ * Runs every 6 hours
+ */
+export { aggregateAdminSummaries } from './si/adminSummaryAggregator';
+
+/**
  * Session Intelligence: After Transcript Created (SI-05)
  * Triggered when a SI recording transcript is created
  * Generates daily summary and appends to daily document
