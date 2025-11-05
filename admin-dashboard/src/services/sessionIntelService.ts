@@ -12,25 +12,9 @@ export async function getDailySummaries(
   limitCount: number = 50
 ): Promise<DailySummary[]> {
   try {
-    let q = query(
-      collection(db, 'summaries'),
-      orderBy('createdAt', 'desc'),
-      firestoreLimit(limitCount)
-    );
-
-    if (conversationId) {
-      q = query(q, where('conversationId', '==', conversationId));
-    }
-
-    if (startDate) {
-      q = query(q, where('createdAt', '>=', Timestamp.fromDate(startDate)));
-    }
-
-    if (endDate) {
-      q = query(q, where('createdAt', '<=', Timestamp.fromDate(endDate)));
-    }
-
-    const snapshot = await getDocs(q);
+    // Note: The actual Firestore structure is /summaries/{cid}/daily/{dateStr}
+    // For admin dashboard, we'll just show mock data until we implement a proper aggregator
+    const snapshot = { empty: true, docs: [] } as any;
     
     if (snapshot.empty) {
       // Return mock data
@@ -76,17 +60,9 @@ export async function getWeeklySummaries(
   limitCount: number = 20
 ): Promise<WeeklySummary[]> {
   try {
-    let q = query(
-      collection(db, 'summaries'),
-      orderBy('weekStart', 'desc'),
-      firestoreLimit(limitCount)
-    );
-
-    if (conversationId) {
-      q = query(q, where('conversationId', '==', conversationId));
-    }
-
-    const snapshot = await getDocs(q);
+    // Note: The actual Firestore structure is /summaries/{cid}/weekly/{weekId}
+    // For admin dashboard, we'll just show mock data until we implement a proper aggregator
+    const snapshot = { empty: true, docs: [] } as any;
     
     if (snapshot.empty) {
       // Return mock data
@@ -147,16 +123,18 @@ export async function getSIAnalytics(
     // Query SI alerts
     const alertsQuery = query(
       collection(db, 'si_alerts'),
-      where('resolved', '==', false),
       orderBy('timestamp', 'desc'),
       firestoreLimit(50)
     );
 
     const alertsSnapshot = await getDocs(alertsQuery);
-    const alerts: SIAlert[] = alertsSnapshot.docs.map(doc => ({
+    const allAlerts: SIAlert[] = alertsSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
     })) as SIAlert[];
+    
+    // Filter unresolved alerts in memory
+    const alerts = allAlerts.filter(alert => !alert.resolved);
 
     // Calculate summary stats
     const errorEvents = events.filter(e => e.eventType === 'error');
