@@ -34,13 +34,13 @@ export default function ProfileScreen() {
 
   // Log user object for debugging
   useEffect(() => {
-    console.log('👤 Profile screen - Firebase Auth user:', {
+    console.log('👤 Profile screen - User:', {
       hasUser: !!user,
       uid: user?.uid,
       email: user?.email,
       displayName: user?.displayName,
       photoURL: user?.photoURL,
-      emailVerified: user?.emailVerified,
+      role: user?.role,
     });
   }, [user]);
 
@@ -153,8 +153,11 @@ export default function ProfileScreen() {
     }
 
     try {
-      // Update Firebase Auth profile
-      await updateProfile(user, { displayName: displayName.trim() });
+      // Update Firebase Auth profile using current auth user
+      const currentAuthUser = auth.currentUser;
+      if (currentAuthUser) {
+        await updateProfile(currentAuthUser, { displayName: displayName.trim() });
+      }
       
       // Update Firestore user document
       const userRef = doc(db, 'users', user.uid);
@@ -209,8 +212,11 @@ export default function ProfileScreen() {
       // Get download URL
       const photoURL = await getDownloadURL(storageRef);
 
-      // Update Firebase Auth profile
-      await updateProfile(user, { photoURL });
+      // Update Firebase Auth profile using current auth user
+      const currentAuthUser = auth.currentUser;
+      if (currentAuthUser) {
+        await updateProfile(currentAuthUser, { photoURL });
+      }
 
       // Update Firestore user document
       const userRef = doc(db, 'users', user.uid);
