@@ -68,8 +68,21 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     const experimentsSnapshot = await getDocs(experimentsQuery);
     const activeExperiments = experimentsSnapshot.size;
 
-    // K-Factor (mock for now - will be implemented in PR-ADMIN-03)
-    const kFactor = 1.2; // TODO: Calculate from actual data
+    // Get latest K-Factor from metrics collection
+    let kFactor = 1.0; // Default
+    try {
+      const kFactorQuery = query(
+        collection(db, 'k_factor_metrics'),
+        orderBy('timestamp', 'desc'),
+        limit(1)
+      );
+      const kFactorSnapshot = await getDocs(kFactorQuery);
+      if (!kFactorSnapshot.empty) {
+        kFactor = kFactorSnapshot.docs[0].data().kFactor || 1.0;
+      }
+    } catch (error) {
+      console.warn('Could not fetch K-Factor, using default:', error);
+    }
 
     return {
       totalUsers,
