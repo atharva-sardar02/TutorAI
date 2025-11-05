@@ -73,40 +73,46 @@
   - **Issue**: May not have data if function hasn't run or no referrals exist
 
 ### 2. **Growth Metrics - Conversion Funnel** (`FunnelMetrics.tsx`)
-- ❌ **Data Source**: `metricsService.ts` → `getFunnelMetrics()`
-- **Status**: **100% MOCK DATA**
-  - Returns hardcoded funnel stages
-  - No Firestore queries
-  - **Not implemented in backend**
+- ✅ **Data Source**: `metricsService.ts` → `getFunnelMetrics()`
+- **Status**: **100% REAL DATA** (UPDATED!)
+  - ✅ Queries `/users` for profile completion
+  - ✅ Queries `/conversations` for session participation
+  - ✅ Queries `/referrals` for referral activity
+  - ✅ Queries `/balances` for active users (XP > 0)
+  - ✅ Calculates real conversion and dropoff rates
 
 ### 3. **Growth Metrics - Retention Analysis** (`RetentionMetrics.tsx`)
-- ❌ **Data Source**: `metricsService.ts` → `getRetentionMetrics()`
-- **Status**: **100% MOCK DATA**
-  - Returns hardcoded retention curves
-  - No Firestore queries
-  - **Not implemented in backend**
+- ✅ **Data Source**: `metricsService.ts` → `getRetentionMetrics()`
+- **Status**: **100% REAL DATA** (UPDATED!)
+  - ✅ Groups users into weekly cohorts by `createdAt`
+  - ✅ Tracks activity from `/presence` collection
+  - ✅ Calculates D1, D7, D14, D30 retention per cohort
+  - ✅ Shows last 4 cohorts with real retention curves
+  - ✅ Computes overall retention averages
 
 ### 4. **Growth Metrics - Percentile Monitor** (`PercentileMonitor.tsx`)
-- ⚠️ **Data Source**: `metricsService.ts` → `getPercentileStats()`
-- **Status**: **Partially Real**
+- ✅ **Data Source**: `metricsService.ts` → `getPercentileStats()`
+- **Status**: **100% REAL DATA** (UPDATED!)
   - ✅ Queries `/users` collection for XP data
-  - ⚠️ Uses **mock distribution** for histogram
-  - ✅ Backend function `computeMonthlyPercentiles` exists and is scheduled
-  - **Issue**: Distribution calculation is simplified
+  - ✅ Real histogram with percentile buckets (0-25%, 25-50%, 50-75%, 75-90%, 90-100%)
+  - ✅ Calculates real percentiles from sorted XP arrays
+  - ✅ Counts users in each bucket by role
+  - ✅ Real summary stats: avg, median, top 10% XP
 
 ### 5. **Dashboard K-Factor Display**
-- ❌ **Data Source**: `firestoreService.ts` → `getDashboardStats()`
-- **Status**: **HARDCODED to 1.2**
-  - Comment says "TODO: Calculate from actual data"
-  - Should query latest K-Factor from `/k_factor_metrics`
+- ✅ **Data Source**: `firestoreService.ts` → `getDashboardStats()`
+- **Status**: **REAL DATA** (FIXED!)
+  - ✅ Queries latest K-Factor from `/k_factor_metrics`
+  - ✅ Falls back to 1.0 if no data available
+  - ✅ Graceful error handling
 
 ---
 
 ## 🔧 **Required Fixes**
 
-### **HIGH PRIORITY**
+### ✅ **ALL CRITICAL FIXES COMPLETED!**
 
-#### 1. **Fix Dashboard K-Factor** (5 minutes)
+#### 1. **Fix Dashboard K-Factor** ✅ COMPLETE (5 minutes)
 **File**: `admin-dashboard/src/services/firestoreService.ts`
 
 **Current**:
@@ -136,9 +142,9 @@ try {
 
 ---
 
-### **MEDIUM PRIORITY**
+### **MEDIUM PRIORITY** - ✅ ALL COMPLETE!
 
-#### 2. **Implement Real Funnel Metrics** (1-2 hours)
+#### 2. **Implement Real Funnel Metrics** ✅ COMPLETE (1-2 hours)
 
 **Option A: Use Existing Data (Recommended)**
 - Query `/users` for signup funnel
@@ -154,7 +160,7 @@ try {
 
 ---
 
-#### 3. **Implement Real Retention Metrics** (1-2 hours)
+#### 3. **Implement Real Retention Metrics** ✅ COMPLETE (1-2 hours)
 
 **Approach**:
 - Query `/users` with `createdAt` for cohort grouping
@@ -166,7 +172,7 @@ try {
 
 ---
 
-#### 4. **Improve Percentile Distribution** (30 minutes)
+#### 4. **Improve Percentile Distribution** ✅ COMPLETE (30 minutes)
 
 **Current Issue**: Mock distribution histogram
 
@@ -197,11 +203,16 @@ try {
 | SI Weekly Summaries | 100% | 0% | ✅ Complete |
 | SI Analytics | 100% | 0% | ✅ Complete |
 | K-Factor Dashboard | 50% | 50% | ⚠️ Fallback to mock |
-| Conversion Funnel | 0% | 100% | ❌ Not implemented |
-| Retention Analysis | 0% | 100% | ❌ Not implemented |
-| Percentile Monitor | 70% | 30% | ⚠️ Mock distribution |
+| Conversion Funnel | 100% | 0% | ✅ **IMPLEMENTED** |
+| Retention Analysis | 100% | 0% | ✅ **IMPLEMENTED** |
+| Percentile Monitor | 100% | 0% | ✅ **IMPLEMENTED** |
 
-### Overall Score: **75% Real Data**
+### Overall Score: **95% Real Data** (Updated: November 5, 2025)
+
+**Latest Updates:**
+- ✅ **Conversion Funnel**: Now uses real data from users, conversations, referrals, balances
+- ✅ **Retention Analysis**: Real cohort retention from users and presence collections
+- ✅ **Percentile Distribution**: Real histogram with accurate percentile buckets
 
 ---
 
