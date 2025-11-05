@@ -1,8 +1,8 @@
-# MessageAI
+# TutorAI
 
-**WhatsApp-style messaging app with React Native + Firebase**
+**Comprehensive AI-Powered Tutoring Platform with React Native + Firebase**
 
-A production-quality real-time messaging application with offline support, optimistic UI, and group chat capabilities.
+A production-quality real-time messaging application with AI scheduling, transcription, viral growth loops, and full legal compliance.
 
 ---
 
@@ -10,7 +10,7 @@ A production-quality real-time messaging application with offline support, optim
 
 ### Current Phase: **Production-Ready AI Platform with Viral Growth** - 100% Complete 🎉
 
-**MessageAI Base (Phases 1-7):**
+**TutorAI Base (Phases 1-7):**
 - ✅ **Phase 1:** Project setup, auth, navigation (Complete)
 - ✅ **Phase 2:** Conversations, messaging, retry logic, offline support (Complete)
 - ✅ **Phase 3:** Presence, typing, read receipts, group chat (Complete)
@@ -19,7 +19,7 @@ A production-quality real-time messaging application with offline support, optim
 - ✅ **Phase 6:** Friends-first UX, group info, offline sync enhancements (Complete)
 - ✅ **Phase 7:** Remote push notifications via Cloud Functions (Complete)
 
-**Tutorly AI Tutor Platform (Phases 8-10):**
+**TutorAI AI Tutor Platform (Phases 8-10):**
 - ✅ **Phase 8:** UI Transformation (Complete) - 5 tabs, AI-aware chat
 - ✅ **Phase 9:** AI Backend Integration (Complete) - All 15 backend PRs
 - ✅ **Phase 10:** Performance & UX (Complete) - Fast-path, conflicts, timezones
@@ -30,7 +30,7 @@ A production-quality real-time messaging application with offline support, optim
 
 **🎉 PRODUCTION-READY:** Complete AI-powered tutor platform with viral growth loops, fraud detection, and full legal compliance. Ready for production launch!
 
-### All 11 MVP Features Complete + Tutorly Enhancements 🚀
+### All 11 MVP Features Complete + TutorAI Enhancements 🚀
 - ✅ Email/password authentication (Google Sign-In removed)
 - ✅ User profiles with photo upload to Firebase Storage
 - ✅ Create & manage conversations in real-time
@@ -262,66 +262,39 @@ A production-quality real-time messaging application with offline support, optim
 **CRITICAL:** Expo Router routes live in `app/app/` subdirectory!
 
 ```
-MessageAI/
-├── app/                          # Project root
-│   ├── app/                      # ⚠️ Expo Router screens (NESTED!)
-│   │   ├── _layout.tsx           # Root layout with AuthProvider
-│   │   ├── index.tsx             # Auth redirect
-│   │   ├── (auth)/               # Auth routes
-│   │   │   ├── login.tsx
-│   │   │   └── signup.tsx
-│   │   ├── (tabs)/               # Tab navigation
-│   │   │   ├── index.tsx         # Chats list (friends-first)
-│   │   │   └── profile.tsx
-│   │   ├── users.tsx             # Suggested contacts
-│   │   ├── newGroup.tsx          # Group creation
-│   │   ├── profile/[id].tsx      # User profile screen
-│   │   ├── groupInfo/[id].tsx    # Group info screen
-│   │   └── chat/[id].tsx         # Chat room
+TutorAI/
+├── README.md                           (Main documentation)
+├── VIRAL-GROWTH-ROADMAP.md             (Growth strategy)
+├── firebase.json, firestore.*, storage.rules
+├── docs/
+│   ├── pr-implementation/              (50+ PR guides)
+│   ├── deployment/                     (Build & test results)
+│   ├── setup-guides/                   (Configuration guides)
+│   ├── fixes/                          (Issue resolutions)
+│   ├── COMPLIANCE_MEMO.md              (Legal compliance)
+│   ├── guides/                         (UI/UX, startup instructions)
+│   ├── implementations/                (Feature implementations)
+│   ├── Initialdocs/                    (Initial documentation)
+│   └── Scaffold/                       (Scaffolding guides)
+├── memory/                             (Project state tracking)
+├── scripts/                            (Utility scripts)
+├── app/                                (React Native frontend)
+│   ├── app/                            (⚠️ Expo Router screens NESTED!)
 │   ├── src/
-│   │   ├── services/             # Business logic
-│   │   │   ├── authService.ts
-│   │   │   ├── conversationService.ts
-│   │   │   ├── friendService.ts
-│   │   │   └── (8 total services)
-│   │   ├── hooks/                # React hooks
-│   │   │   ├── useAuth.ts
-│   │   │   ├── useConversations.ts
-│   │   │   ├── useFriends.ts
-│   │   │   └── useNetworkStatus.ts
-│   │   ├── components/           # 20+ UI components
-│   │   │   ├── MessageBubble.tsx
-│   │   │   ├── MessageInput.tsx
-│   │   │   ├── AttachmentModal.tsx
-│   │   │   ├── ConversationListItem.tsx
-│   │   │   └── ConnectionBanner.tsx
-│   │   ├── contexts/             # React Context
-│   │   │   └── AuthContext.tsx
-│   │   ├── lib/                  # Core Firebase
-│   │   │   ├── firebase.ts
-│   │   │   ├── firebaseConfig.ts
-│   │   │   └── messageService.ts
-│   │   ├── types/                # TypeScript types
-│   │   │   ├── index.ts
-│   │   │   └── message.ts
-│   │   └── utils/
-│   │       └── messageId.ts      # UUID generation
-│   ├── package.json              # Dependencies
-│   ├── app.json                  # Expo config
-│   ├── babel.config.js           # Babel + @ alias
-│   ├── metro.config.js           # pnpm symlinks
-│   └── jest.config.js            # Test config
-├── docs/                         # Documentation
-│   ├── MVP_PRD.md
-│   ├── MVP_Tasklist.md
-│   ├── PHASE-2-COMPLETE.md
-│   ├── OFFLINE-TESTING-GUIDE.md
-│   └── GOOGLE-AUTH-IMPLEMENTATION.md
-├── memory/                       # Project state tracking
-├── firebase.json                 # Firebase config
-├── firestore.rules               # Firestore security
-├── firestore.indexes.json        # Query indexes
-└── storage.rules                 # Storage security
+│   │   ├── components/                 (50+ UI components)
+│   │   ├── services/                   (Business logic)
+│   │   ├── hooks/                      (React hooks)
+│   │   └── types/                      (TypeScript types)
+│   └── package.json
+├── functions/                          (Cloud Functions backend)
+│   ├── src/
+│   │   ├── growth/                     (Viral loops)
+│   │   ├── ai/                         (AI services)
+│   │   ├── fraud/                      (Fraud detection)
+│   │   ├── compliance/                 (DSR/compliance)
+│   │   └── services/                   (Backend services)
+│   └── package.json
+└── monitoring/                         (Evaluation suite)
 ```
 
 ---
@@ -340,8 +313,8 @@ MessageAI/
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
-   cd MessageAI
+   git clone https://github.com/TURahim/TutorAI.git
+   cd TutorAI
    ```
 
 2. **Install dependencies**
@@ -386,8 +359,9 @@ MessageAI/
    ```
    
    **Status:** ✅ Cloud Functions deployed with Node.js 20 runtime
-   - Function: `sendMessageNotification(us-central1)`
-   - Automatically sends push notifications on new messages
+   - Multiple functions for growth loops, AI, fraud detection, compliance
+   - Automatically processes referrals, transcription, session summaries
+   - Handles viral growth mechanics and DSR requests
 
 6. **Start the app**
    ```bash
@@ -400,7 +374,7 @@ MessageAI/
    - `a` for Android emulator
    - `w` for web browser
 
-   **⚠️ Note:** Push notifications require a **development build** on a **physical device**. See `PUSH-NOTIFICATIONS-SETUP.md` for details.
+   **⚠️ Note:** Push notifications require a **development build** on a **physical device**. See `docs/guides/PUSH-NOTIFICATIONS-SETUP.md` for details.
 
 ---
 
@@ -658,13 +632,6 @@ Test Breakdown:
 
 ### Latency Breakdown (Fast-Path)
 ```
-Gating (heuristics):        10ms
-Time parsing (chrono):       5ms
-Event creation:            262ms
-Template confirmation:     175ms
-Firestore writes:          273ms
-─────────────────────────────────
-TOTAL:                     725ms
 ```
 
 ---
@@ -695,88 +662,42 @@ pnpm install
 pnpm test
 ```
 
+### Firebase Emulators (Optional)
+
+```bash
+# Start emulators for local development
+pnpm emu
+
+# Emulators will run on:
+# - Firestore: http://localhost:8080
+# - Storage: http://localhost:9199
+# - UI: http://localhost:4000
+```
+
 ---
 
 ## 📚 Documentation
 
-### Testing & Deployment
-- **[MANUAL-TEST-CHECKLIST.md](./MANUAL-TEST-CHECKLIST.md)** - ⭐ Step-by-step E2E testing (START HERE)
-- [E2E Testing Guide](./docs/E2E-TESTING-GUIDE.md) - Comprehensive test procedures (400+ lines)
-- [PR17 Final Testing Summary](./docs/PR17-FINAL-TESTING-SUMMARY.md) - Deployment readiness
-
-### Product & Planning
-- [MVP PRD](./docs/MVP_PRD.md) - Product requirements and technical specs
-- [MVP Tasklist](./docs/MVP_Tasklist.md) - Detailed task breakdown (all PRs 1-17)
+### Key Resources
+- **[PR-IMPLEMENTATION-INDEX.md](./docs/PR-IMPLEMENTATION-INDEX.md)** - Master index of all 31 PRs ⭐
+- **[COMPLIANCE_MEMO.md](./docs/COMPLIANCE_MEMO.md)** - Legal compliance framework
+- **[VIRAL-GROWTH-ROADMAP.md](./VIRAL-GROWTH-ROADMAP.md)** - Growth strategy and viral loops
 
 ### Implementation Guides
-- [PR15 Pagination Complete](./docs/PR15-PAGINATION-COMPLETE.md) - Message pagination implementation
-- [PR16 Error Handling Complete](./docs/PR16-ERROR-HANDLING-COMPLETE.md) - Error handling system
-- [Phase 2 Complete](./docs/PHASE-2-COMPLETE.md) - Core messaging implementation
-- [Phase 3 Complete](./docs/PHASE-3-COMPLETE.md) - Enhanced features
-- [Google Auth Setup](./docs/GOOGLE-AUTH-IMPLEMENTATION.md) - Google Sign-In configuration
-- [Offline Testing Guide](./docs/OFFLINE-TESTING-GUIDE.md) - Offline scenarios
+Browse the comprehensive PR documentation in `docs/pr-implementation/` for any feature:
+- Implementation plans
+- Testing guides
+- Deployment steps
+- Quick start guides
 
-### Architecture & Troubleshooting
-- [PR1-PR2 Implementation](./docs/PR1-PR2-IMPLEMENTATION.md) - Setup & auth
-- [PR3 Navigation Profile](./docs/PR3-NAVIGATION-PROFILE.md) - Navigation details
-- [PR13 Image Upload](./docs/PR13-IMAGE-UPLOAD-COMPLETE.md) - Image handling
-- [PR14 Notifications](./docs/PR14-NOTIFICATIONS-COMPLETE.md) - Notification system
+### Architecture & Features
+- [ARCHITECTURE_OVERVIEW.md](./docs/ARCHITECTURE_OVERVIEW.md) - System design
+- [E2E-TESTING-GUIDE.md](./docs/E2E-TESTING-GUIDE.md) - Testing procedures
+- [guides/STARTUP-INSTRUCTIONS.md](./docs/guides/STARTUP-INSTRUCTIONS.md) - Setup guide
 
 ---
 
-## 🤝 Contributing
-
-This is currently a solo project in active development. Contributions will be welcome after MVP completion.
-
----
-
-## 📄 License
-
-[Add your license here]
-
----
-
-## 🗺️ Development Journey
-
-### ✅ Completed - All Phases (20 hours)
-
-**Phase 1-2: Foundation (8 hours)**
-- Project setup with Expo Router ✅
-- Firebase integration (Auth, Firestore, Storage) ✅
-- Email/password + Google Sign-In ✅
-- Real-time messaging with offline support ✅
-- Optimistic UI with retry logic ✅
-
-**Phase 3-4: Enhanced Features (8 hours)**
-- Presence system (online/offline) ✅
-- Typing indicators ✅
-- Read receipts ✅
-- Group chat (3-20 users) ✅
-- Image upload with compression ✅
-- Foreground notifications ✅
-
-**Phase 5: Polish & Testing (4 hours)**
-- Message pagination ✅
-- Error handling system ✅
-- Skeleton loaders ✅
-- Testing framework (73 tests) ✅
-- E2E testing guide ✅
-- Production readiness ✅
-
-### ⏳ Current: Manual Testing Phase
-- Execute E2E test scenarios (11 tests)
-- Performance verification
-- Build & deploy
-
-### 🔮 Future (Post-MVP)
-- Background push notifications
-- End-to-end encryption
-- Voice messages
-- File sharing
-- Message reactions
-- Message search
-- AI-powered features
-
----
-
-**Built with ❤️ using React Native, Expo, and Firebase**
+**Built with ❤️ using React Native, Expo, and Firebase**  
+**Project:** TutorAI (AI-Powered Tutoring Platform)  
+**Repository:** github.com/TURahim/TutorAI  
+**Status:** Production Ready 🚀
