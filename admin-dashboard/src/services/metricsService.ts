@@ -78,61 +78,220 @@ export async function getKFactorMetrics(
 }
 
 /**
- * Fetch funnel metrics (mock for now)
+ * Fetch funnel metrics from real user data
  */
 export async function getFunnelMetrics(): Promise<FunnelMetrics> {
-  return {
-    stages: [
-      { stage: 'Visited Landing', count: 1000, conversionRate: 100, dropoffRate: 0 },
-      { stage: 'Started Signup', count: 600, conversionRate: 60, dropoffRate: 40 },
-      { stage: 'Completed Profile', count: 450, conversionRate: 45, dropoffRate: 15 },
-      { stage: 'First Session', count: 350, conversionRate: 35, dropoffRate: 10 },
-      { stage: 'Active User', count: 280, conversionRate: 28, dropoffRate: 7 },
-    ],
-    totalEntered: 1000,
-    totalConverted: 280,
-    overallConversionRate: 28,
-    avgTimeToConvert: 3.5,
-  };
+  try {
+    // Get all users
+    const usersSnapshot = await getDocs(collection(db, 'users'));
+    const users = usersSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    const totalUsers = users.length;
+
+    // Stage 1: Signed Up (all users who exist)
+    const signedUp = totalUsers;
+
+    // Stage 2: Completed Profile (users with displayName and role)
+    const profileComplete = users.filter(user => 
+      user.displayName && user.role
+    ).length;
+
+    // Stage 3: First Session (users with at least one conversation or session)
+    const conversationsSnapshot = await getDocs(collection(db, 'conversations'));
+    const usersWithSessions = new Set<string>();
+    conversationsSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      if (data.participants) {
+        data.participants.forEach((uid: string) => usersWithSessions.add(uid));
+      }
+    });
+    const firstSession = usersWithSessions.size;
+
+    // Stage 4: Made First Referral (users with at least one referral)
+    const referralsSnapshot = await getDocs(collection(db, 'referrals'));
+    const usersWithReferrals = new Set<string>();
+    referralsSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      if (data.referrerId) {
+        usersWithReferrals.add(data.referrerId);
+      }
+    });
+    const madeReferral = usersWithReferrals.size;
+
+    // Stage 5: Active User (users with XP > 0 or recent activity)
+    const balancesSnapshot = await getDocs(collection(db, 'balances'));
+    const activeUsers = balancesSnapshot.docs.filter(doc => {
+      const data = doc.data();
+      return data.xpBalance && data.xpBalance > 0;
+    }).length;
+
+    // Calculate conversion rates
+    const stages = [
+      {
+        stage: 'Signed Up',
+        count: signedUp,
+        conversionRate: 100,
+        dropoffRate: 0,
+      },
+      {
+        stage: 'Completed Profile',
+        count: profileComplete,
+        conversionRate: signedUp > 0 ? Math.round((profileComplete / signedUp) * 100) : 0,
+        dropoffRate: signedUp > 0 ? Math.round(((signedUp - profileComplete) / signedUp) * 100) : 0,
+      },
+      {
+        stage: 'First Session',
+        count: firstSession,
+        conversionRate: signedUp > 0 ? Math.round((firstSession / signedUp) * 100) : 0,
+        dropoffRate: profileComplete > 0 ? Math.round(((profileComplete - firstSession) / profileComplete) * 100) : 0,
+      },
+      {
+        stage: 'Made Referral',
+        count: madeReferral,
+        conversionRate: signedUp > 0 ? Math.round((madeReferral / signedUp) * 100) : 0,
+        dropoffRate: firstSession > 0 ? Math.round(((firstSession - madeReferral) / firstSession) * 100) : 0,
+      },
+      {
+        stage: 'Active User',
+        count: activeUsers,
+        conversionRate: signedUp > 0 ? Math.round((activeUsers / signedUp) * 100) : 0,
+        dropoffRate: madeReferral > 0 ? Math.round(((madeReferral - activeUsers) / madeReferral) * 100) : 0,
+      },
+    ];
+
+    // Calculate average time to convert (simplified - would need timestamp analysis)
+    const avgTimeToConvert = 2.5; // Default estimate in days
+
+    return {
+      stages,
+      totalEntered: signedUp,
+      totalConverted: activeUsers,
+      overallConversionRate: signedUp > 0 ? Math.round((activeUsers / signedUp) * 100) : 0,
+      avgTimeToConvert,
+    };
+  } catch (error) {
+    console.error('Error fetching funnel metrics:', error);
+    throw error;
+  }
 }
 
 /**
- * Fetch retention metrics (mock for now)
+ * Fetch retention metrics from real user activity data
  */
 export async function getRetentionMetrics(): Promise<RetentionMetrics> {
-  return {
-    cohorts: [
-      {
-        cohortDate: '2025-10-01',
-        size: 100,
-        retention: [
-          { day: 1, retained: 85, retentionRate: 85 },
-          { day: 7, retained: 65, retentionRate: 65 },
-          { day: 14, retained: 55, retentionRate: 55 },
-          { day: 30, retained: 45, retentionRate: 45 },
-        ],
-      },
-      {
-        cohortDate: '2025-10-15',
-        size: 120,
-        retention: [
-          { day: 1, retained: 100, retentionRate: 83.3 },
-          { day: 7, retained: 80, retentionRate: 66.7 },
-          { day: 14, retained: 70, retentionRate: 58.3 },
-        ],
-      },
-    ],
-    overallRetention: [
-      { day: 1, avgRetentionRate: 84 },
-      { day: 7, avgRetentionRate: 66 },
-      { day: 14, avgRetentionRate: 57 },
-      { day: 30, avgRetentionRate: 45 },
-    ],
-  };
+  try {
+    // Get all users with their creation dates
+    const usersSnapshot = await getDocs(collection(db, 'users'));
+    const users = usersSnapshot.docs.map(doc => ({
+      id: doc.id,
+      createdAt: doc.data().createdAt,
+    }));
+
+    // Get all presence/activity data
+    const presenceSnapshot = await getDocs(collection(db, 'presence'));
+    const userActivity = new Map<string, Date[]>();
+    
+    presenceSnapshot.docs.forEach(doc => {
+      const data = doc.data();
+      const userId = doc.id;
+      const lastSeen = data.lastSeen?.toDate();
+      
+      if (lastSeen) {
+        if (!userActivity.has(userId)) {
+          userActivity.set(userId, []);
+        }
+        userActivity.get(userId)!.push(lastSeen);
+      }
+    });
+
+    // Group users into cohorts by signup week
+    const cohortMap = new Map<string, { users: string[], createdAt: Date }>();
+    
+    users.forEach(user => {
+      if (!user.createdAt) return;
+      
+      const createdDate = user.createdAt.toDate();
+      const cohortKey = getWeekStart(createdDate).toISOString().split('T')[0];
+      
+      if (!cohortMap.has(cohortKey)) {
+        cohortMap.set(cohortKey, { users: [], createdAt: getWeekStart(createdDate) });
+      }
+      cohortMap.get(cohortKey)!.users.push(user.id);
+    });
+
+    // Calculate retention for each cohort (last 4 cohorts)
+    const cohorts = Array.from(cohortMap.entries())
+      .sort((a, b) => b[1].createdAt.getTime() - a[1].createdAt.getTime())
+      .slice(0, 4)
+      .map(([cohortDate, cohortData]) => {
+        const size = cohortData.users.length;
+        const retention = [1, 7, 14, 30].map(day => {
+          const targetDate = new Date(cohortData.createdAt);
+          targetDate.setDate(targetDate.getDate() + day);
+          
+          // Count users active on or after target date
+          const retained = cohortData.users.filter(userId => {
+            const activities = userActivity.get(userId) || [];
+            return activities.some(activityDate => activityDate >= targetDate);
+          }).length;
+          
+          return {
+            day,
+            retained,
+            retentionRate: size > 0 ? Math.round((retained / size) * 100) : 0,
+          };
+        });
+
+        return {
+          cohortDate,
+          size,
+          retention,
+        };
+      });
+
+    // Calculate overall retention averages
+    const retentionDays = [1, 7, 14, 30];
+    const overallRetention = retentionDays.map(day => {
+      const rates = cohorts
+        .map(c => c.retention.find(r => r.day === day))
+        .filter(r => r !== undefined)
+        .map(r => r!.retentionRate);
+      
+      const avgRetentionRate = rates.length > 0
+        ? Math.round(rates.reduce((sum, rate) => sum + rate, 0) / rates.length)
+        : 0;
+
+      return {
+        day,
+        avgRetentionRate,
+      };
+    });
+
+    return {
+      cohorts,
+      overallRetention,
+    };
+  } catch (error) {
+    console.error('Error fetching retention metrics:', error);
+    throw error;
+  }
 }
 
 /**
- * Fetch percentile statistics from users collection
+ * Helper: Get start of week for a date
+ */
+function getWeekStart(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day;
+  return new Date(d.setDate(diff));
+}
+
+/**
+ * Fetch percentile statistics from users collection with real distribution
  */
 export async function getPercentileStats(): Promise<PercentileStats> {
   try {
@@ -151,24 +310,84 @@ export async function getPercentileStats(): Promise<PercentileStats> {
       else if (role === 'parent') parents.push(xp);
     });
 
-    // Mock distribution and summary
+    // Sort XP arrays for percentile calculation
+    tutors.sort((a, b) => a - b);
+    parents.sort((a, b) => a - b);
+
+    // Calculate real distribution (histogram buckets)
+    const distribution = [];
+    const percentileBuckets = [
+      { min: 90, max: 100, label: 90 },
+      { min: 75, max: 90, label: 75 },
+      { min: 50, max: 75, label: 50 },
+      { min: 25, max: 50, label: 25 },
+      { min: 0, max: 25, label: 10 },
+    ];
+
+    for (const role of ['tutor', 'parent'] as const) {
+      const xpArray = role === 'tutor' ? tutors : parents;
+      if (xpArray.length === 0) continue;
+
+      for (const bucket of percentileBuckets) {
+        const minXp = calculatePercentile(xpArray, bucket.min);
+        const maxXp = calculatePercentile(xpArray, bucket.max);
+        
+        const count = xpArray.filter(xp => xp >= minXp && xp < maxXp).length;
+        
+        distribution.push({
+          percentile: bucket.label,
+          count,
+          role,
+        });
+      }
+    }
+
+    // Calculate summary statistics
+    const summary = [];
+    
+    for (const role of ['tutor', 'parent'] as const) {
+      const xpArray = role === 'tutor' ? tutors : parents;
+      
+      if (xpArray.length > 0) {
+        const avgXp = Math.round(xpArray.reduce((sum, xp) => sum + xp, 0) / xpArray.length);
+        const medianXp = calculatePercentile(xpArray, 50);
+        const top10PercentXp = calculatePercentile(xpArray, 90);
+        
+        summary.push({
+          role,
+          totalUsers: xpArray.length,
+          avgXp,
+          medianXp,
+          top10PercentXp,
+        });
+      } else {
+        summary.push({
+          role,
+          totalUsers: 0,
+          avgXp: 0,
+          medianXp: 0,
+          top10PercentXp: 0,
+        });
+      }
+    }
+
     return {
-      distribution: [
-        { percentile: 90, count: 15, role: 'tutor' },
-        { percentile: 75, count: 25, role: 'tutor' },
-        { percentile: 50, count: 50, role: 'tutor' },
-        { percentile: 25, count: 25, role: 'tutor' },
-        { percentile: 10, count: 10, role: 'tutor' },
-      ],
-      summary: [
-        { role: 'tutor', totalUsers: tutors.length, avgXp: 1500, medianXp: 1200, top10PercentXp: 3500 },
-        { role: 'parent', totalUsers: parents.length, avgXp: 1200, medianXp: 1000, top10PercentXp: 3000 },
-      ],
-      xpTrends: [],
+      distribution,
+      summary,
+      xpTrends: [], // Could be populated with historical data
     };
   } catch (error) {
     console.error('Error fetching percentile stats:', error);
     throw error;
   }
+}
+
+/**
+ * Helper: Calculate percentile value from sorted array
+ */
+function calculatePercentile(sortedArray: number[], percentile: number): number {
+  if (sortedArray.length === 0) return 0;
+  const index = Math.ceil((percentile / 100) * sortedArray.length) - 1;
+  return sortedArray[Math.max(0, Math.min(index, sortedArray.length - 1))];
 }
 
