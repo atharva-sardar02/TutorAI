@@ -23,6 +23,7 @@
       "bundleIdentifier": "com.dawnrobotics.messageai",
       "infoPlist": {
         "UIBackgroundModes": [
+          "remote-notification",
           "remote-notification"
         ]
       }
@@ -36,6 +37,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.dawnrobotics.messageai",
       "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
         "android.permission.POST_NOTIFICATIONS"
       ]
     },
@@ -59,6 +61,10 @@
       "eas": {
         "projectId": "e0362f41-e619-4df8-ad3a-4dbcff0ce438"
       }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/e0362f41-e619-4df8-ad3a-4dbcff0ce438"
     }
   }
 }

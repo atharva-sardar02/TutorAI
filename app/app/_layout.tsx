@@ -1,9 +1,11 @@
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
+import * as Linking from 'expo-linking';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { usePresence } from '@/hooks/usePresence';
 import { useAuth } from '@/hooks/useAuth';
 import { registerForPushNotifications, setupNotificationTapHandler } from '@/services/notificationService';
+import { handleDeepLink } from '@/services/growth/referralService';
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -35,6 +37,25 @@ function AppContent() {
       setupNotifications();
     }
   }, [user]);
+
+  // Handle deep links for referral attribution (PR15)
+  useEffect(() => {
+    // Listen for deep links (app opened from link)
+    const subscription = Linking.addEventListener('url', async ({ url }) => {
+      console.log('🔗 Deep link received:', url);
+      await handleDeepLink(url);
+    });
+
+    // Check initial URL (cold start - app opened from link)
+    Linking.getInitialURL().then(async (url) => {
+      if (url) {
+        console.log('🔗 Initial URL detected:', url);
+        await handleDeepLink(url);
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   // Minimal auth guard
   useEffect(() => {

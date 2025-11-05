@@ -9,6 +9,8 @@ import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from '@/lib/firebase';
 import TimezonePicker from '@/components/TimezonePicker';
+import { TutorPeerReferralModal } from '@/components/growth/TutorPeerReferralModal';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProfileScreen() {
   const { user } = useAuth();
@@ -26,6 +28,9 @@ export default function ProfileScreen() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [deleting, setDeleting] = useState(false);
+  
+  // PR24: Tutor referral modal state
+  const [showReferralModal, setShowReferralModal] = useState(false);
 
   // Log user object for debugging
   useEffect(() => {
@@ -334,6 +339,17 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       )}
 
+      {/* PR24: Tutor Referral Button */}
+      {firestoreProfile?.userType === 'tutor' && (
+        <TouchableOpacity
+          style={[styles.button, styles.referButton]}
+          onPress={() => setShowReferralModal(true)}
+        >
+          <Ionicons name="people" size={20} color="white" />
+          <Text style={styles.buttonText}>Refer a Tutor</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Sign Out */}
       <TouchableOpacity 
         style={[styles.button, styles.signOutButton]} 
@@ -403,6 +419,12 @@ export default function ProfileScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* PR24: Tutor Peer Referral Modal */}
+      <TutorPeerReferralModal
+        visible={showReferralModal}
+        onClose={() => setShowReferralModal(false)}
+      />
     </View>
   );
 }
@@ -610,6 +632,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#007AFF',
     fontWeight: '500',
+  },
+  referButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#2196F3',
+    gap: 8,
   },
 });
 

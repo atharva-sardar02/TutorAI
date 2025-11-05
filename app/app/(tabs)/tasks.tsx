@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 import { useDeadlines } from '@/hooks/useDeadlines';
 import DeadlineList, { Deadline } from '@/components/DeadlineList';
@@ -83,6 +84,14 @@ export default function TasksScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Test button for Micro-FVM (PR26) */}
+      <TouchableOpacity
+        style={styles.testButton}
+        onPress={() => router.push('/testMicroFVM')}
+      >
+        <Text style={styles.testButtonText}>🎯 Test Micro-FVM (PR26)</Text>
+      </TouchableOpacity>
+
       {/* Deadline list with sections */}
       <DeadlineList
         deadlines={deadlines}
@@ -117,6 +126,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
+  },
+  testButton: {
+    backgroundColor: '#007AFF',
+    padding: 12,
+    margin: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  testButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

@@ -16,6 +16,56 @@ import { processLongGapAlerts } from './ai/nudgeGenerator';
 // Export admin viewer (PR3)
 export { viewFailedOps } from './admin/failedOpsViewer';
 
+// Export growth functions (PR15)
+export {
+  createReferralLink,
+  trackReferralClick,
+  getReferralChain,
+} from './growth/referralHandler';
+
+// Orchestrator (PR16)
+export { getOrchestratorDecision } from './growth/loopOrchestrator';
+
+// Incentives & Economy (PR25)
+export { 
+  issueReward, 
+  redeemReward, 
+  getUserBalance,
+  clawbackReward
+} from './growth/incentivesAgent';
+
+// MCP Agent Replay (PR28)
+export { getAgentReplay } from './growth/agentReplay';
+
+// Experiments & A/B Testing (PR17)
+export { 
+  listExperiments, 
+  createExperiment, 
+  updateExperiment 
+} from './growth/experimentService';
+export { computeKFactor } from './growth/computeMetrics';
+export { checkGuardrails } from './growth/guardrails';
+
+// Growth Ops Dashboard (PR29)
+export {
+  getKFactorMetrics,
+  getFunnelMetrics,
+  getRetentionMetrics,
+  getFraudQueue,
+  // approveFraudItem, // PR22: Moved to fraud/fraudQueue.ts
+  // rejectFraudItem, // PR22: Moved to fraud/fraudQueue.ts
+} from './growth/adminApi';
+export {
+  listKillSwitches,
+  toggleKillSwitch,
+} from './growth/killswitchApi';
+
+// Tutor Cards (PR18)
+export { generateTutorCard } from './growth/generateTutorCard';
+
+// Micro-FVM (PR26)
+export { startMicroFVM, submitMicroFVM } from './growth/microFVMHandler';
+
 // Initialize Firebase Admin
 admin.initializeApp();
 
@@ -647,4 +697,170 @@ export const dailyNudgeJob = onSchedule({
     });
   }
 });
+
+/**
+ * Cloud Function: Subject Presence Aggregator (PR21)
+ * Runs every 5 minutes to compute active sessions by subject
+ */
+export const subjectPresenceAggregator = onSchedule({
+  schedule: 'every 5 minutes',
+  region: 'us-central1',
+  timeoutSeconds: 60,
+  memory: '256MiB',
+}, async () => {
+  logger.info('📊 Running subject presence aggregation');
+  
+  try {
+    const { computeSubjectPresence } = await import('./presence/computeSubjectPresence');
+    const activeCount = await computeSubjectPresence();
+    
+    logger.info('✅ Subject presence aggregation complete', {
+      activeSessions: activeCount,
+    });
+  } catch (error: any) {
+    logger.error('❌ Subject presence aggregation failed', {
+      error: error.message,
+      stack: error.stack,
+    });
+  }
+});
+
+// ================================================================================
+// PR20: Transcription & Agentic Actions
+// ================================================================================
+
+/**
+ * Export transcription service
+ * Triggered when audio files are uploaded to Storage
+ */
+export { transcribeSession } from './transcription/transcribeSession';
+
+/**
+ * Cloud Function: After Transcript Created (PR20)
+ * Triggered when a transcript document is created
+ * Generates AI summary using GPT-4o-mini
+ */
+export const afterTranscript = onDocumentCreated({
+  document: 'transcripts/{sessionId}',
+  region: 'us-central1',
+  timeoutSeconds: 60,
+  memory: '512MiB',
+}, async (event) => {
+  const sessionId = event.params.sessionId;
+  const transcript = event.data?.data();
+  
+  if (!transcript) {
+    logger.error('No transcript data found', { sessionId });
+    return;
+  }
+  
+  if (transcript.status !== 'complete') {
+    logger.info('Skipping incomplete transcript', { sessionId, status: transcript.status });
+    return;
+  }
+  
+  logger.info('📝 Transcript created, starting summarization', { sessionId });
+  
+  try {
+    const { summarizeSession } = await import('./ai/sessionSummarizer');
+    await summarizeSession(sessionId);
+    
+    logger.info('✅ Summarization complete', { sessionId });
+  } catch (error: any) {
+    logger.error('❌ Summarization failed', {
+      sessionId,
+      error: error.message,
+      stack: error.stack,
+    });
+  }
+});
+
+/**
+ * Cloud Function: After Summary Created (PR20)
+ * Triggered when a session summary is created
+ * Analyzes and executes viral actions
+ */
+export const afterSummary = onDocumentCreated({
+  document: 'sessions/{sessionId}/summary/latest',
+  region: 'us-central1',
+  timeoutSeconds: 300,
+  memory: '512MiB',
+}, async (event) => {
+  const sessionId = event.params.sessionId;
+  const summary = event.data?.data();
+  
+  if (!summary) {
+    logger.error('No summary data found', { sessionId });
+    return;
+  }
+  
+  logger.info('🤖 Summary created, analyzing actions', { sessionId });
+  
+  try {
+    // Fetch session data
+    const sessionDoc = await admin.firestore()
+      .collection('sessions')
+      .doc(sessionId)
+      .get();
+    
+    if (!sessionDoc.exists) {
+      logger.warn('Session document not found, using minimal data', { sessionId });
+    }
+    
+    const sessionData = sessionDoc.exists ? sessionDoc.data()! : { sessionId };
+    
+    // Analyze opportunities
+    const { analyzeActions } = await import('./growth/actionAnalyzer');
+    const opportunities = await analyzeActions(sessionId, summary as any, sessionData);
+    
+    logger.info('💡 Opportunities identified', {
+      sessionId,
+      opportunityCount: opportunities.length,
+    });
+    
+    // Execute approved actions
+    const { executeActions } = await import('./growth/actionExecutor');
+    const results = await executeActions(sessionId, opportunities, sessionData);
+    
+    logger.info('✅ Action execution complete', {
+      sessionId,
+      successCount: results.filter(r => r.status === 'success').length,
+      totalCount: results.length,
+    });
+    
+  } catch (error: any) {
+    logger.error('❌ Action execution failed', {
+      sessionId,
+      error: error.message,
+      stack: error.stack,
+    });
+  }
+});
+
+// PR19: Progress Reels - Consent Revocation Trigger
+export { onConsentRevoked } from './growth/onConsentRevoked';
+
+// PR27: Cohort Rooms + Leaderboards
+export { joinCohortRoom, leaveCohortRoom } from './growth/cohortRoomService';
+export { computeLeaderboards } from './growth/leaderboardService';
+export { setLeaderboardOptOut } from './growth/privacySettings';
+
+// PR23: Study Buddy Challenge
+export {
+  createStudyBuddyChallenge,
+  joinStudyBuddyChallenge,
+  submitStudyBuddyChallenge,
+  getStudyBuddyChallenge,
+} from './growth/studyBuddyService';
+
+// PR24: Parent Pod + Tutor Peer Referrals
+export { createParentPodInvite } from './growth/parentPodInvites';
+export {
+  createTutorPeerReferral,
+  issueTutorPeerRewards,
+} from './growth/tutorPeerReferral';
+
+// PR22: Fraud Detection
+export { verifyCaptcha } from './fraud/captchaHandler';
+export { approveFraudItem, rejectFraudItem } from './fraud/fraudQueue';
 

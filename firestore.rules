@@ -256,6 +256,323 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    // --- REFERRALS COLLECTION (PR15) ---
+    // Viral growth referral tracking
+    // Only Cloud Functions can write (server-side only)
+    match /referrals/{referralId} {
+      // Users can read referrals they created or received
+      allow read: if request.auth != null && (
+        request.auth.uid == resource.data.referrerId ||
+        request.auth.uid == resource.data.referredUserId
+      );
+      
+      // Only Cloud Functions can write (via admin SDK)
+      allow write: if false;
+    }
+
+    // --- ATTRIBUTION_FAILURES COLLECTION (PR15) ---
+    // Log of failed attribution attempts for manual review
+    match /attribution_failures/{failureId} {
+      // Only admins can read (for debugging)
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- COOLDOWNS COLLECTION (PR16) ---
+    // Track when users were last shown viral prompts
+    match /cooldowns/{userId}/loops/{loopType} {
+      // Users can read their own cooldowns
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- LOOP_EXPOSURES COLLECTION (PR16) ---
+    // Log all orchestrator decisions for analytics
+    match /loop_exposures/{exposureId} {
+      // Users can read their own exposure history (for debugging)
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- REWARDS COLLECTION (PR25) ---
+    // Individual reward grants (immutable audit trail)
+    match /rewards/{userId}/grants/{rewardId} {
+      // Users can read their own rewards
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- BALANCES COLLECTION (PR25) ---
+    // Aggregate user balances (XP, class passes, etc.)
+    match /balances/{userId} {
+      // Users can read their own balance
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- REDEMPTIONS COLLECTION (PR25) ---
+    // History of reward redemptions
+    match /redemptions/{userId}/history/{redemptionId} {
+      // Users can read their own redemption history
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- REWARD_POLICY COLLECTION (PR25) ---
+    // Global reward configuration
+    match /reward_policy/{docId} {
+      // Anyone authenticated can read policy
+      allow read: if request.auth != null;
+      
+      // Only admins can write
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // --- REWARDS_AUDIT_LOG COLLECTION (PR25) ---
+    // Audit trail for all reward operations
+    match /rewards_audit_log/{logId} {
+      // Only admins can read (for debugging)
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- FEATURE_FLAGS COLLECTION (PR32) ---
+    // Central configuration for kill-switches
+    match /feature_flags/{flagName} {
+      // Anyone authenticated can read flags (for client-side checks)
+      allow read: if request.auth != null;
+      
+      // Only admins can write
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // --- AGENT_LOGS COLLECTION (PR28) ---
+    // MCP agent decision logs for replay/debugging
+    match /agent_logs/{userId}/decisions/{logId} {
+      // Users can read their own logs
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+    
+    // Allow admins to read all agent logs (for replay endpoint)
+    match /agent_logs/{userId}/decisions/{logId} {
+      allow read: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // --- EXPERIMENTS COLLECTION (PR17) ---
+    // A/B test experiments
+    match /experiments/{experimentId} {
+      // Anyone authenticated can read (for variant allocation)
+      allow read: if request.auth != null;
+      
+      // Only admins can write
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // --- EXPERIMENT_METRICS COLLECTION (PR17) ---
+    // Daily K-factor metrics per variant
+    match /experiment_metrics/{experimentId}/variants/{variantId}/daily/{date} {
+      // Anyone authenticated can read
+      allow read: if request.auth != null;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- EXPERIMENT_EVENTS COLLECTION (PR17) ---
+    // Growth events for K-factor computation
+    match /experiment_events/{eventId} {
+      // Only admins can read
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- TUTOR_CARDS COLLECTION (PR18) ---
+    // Shareable tutor cards with stats
+    match /tutor_cards/{tutorId}/cards/{cardId} {
+      // Tutors can read their own cards
+      allow read: if request.auth != null && request.auth.uid == tutorId;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // Allow card views from referral links (anyone with link can view for attribution)
+    match /tutor_cards/{tutorId}/cards/{cardId} {
+      allow get: if request.auth != null;
+    }
+
+    // --- FRAUD_QUEUE COLLECTION (PR22/PR29) ---
+    // Fraud review queue for admins
+    match /fraud_queue/{referralId} {
+      // Only admins can read
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- ADMIN_AUDIT_LOG COLLECTION (PR29) ---
+    // Audit trail for admin actions
+    match /admin_audit_log/{logId} {
+      // Only admins can read
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- MICRO_FVM_SESSIONS COLLECTION (PR26) ---
+    // Guest assessments for viral growth
+    match /micro_fvm_sessions/{sessionId} {
+      // Guest users can create sessions (no auth required)
+      allow create: if true;
+      
+      // Only creator can read/update their session
+      // Guests identified by guestId, authenticated by userId
+      allow read, update: if request.auth == null 
+        ? resource.data.guestId == request.resource.data.guestId
+        : resource.data.userId == request.auth.uid;
+      
+      // Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- RESULTS_CARDS COLLECTION (PR26) ---
+    // Shareable results cards with OG images
+    match /results_cards/{cardId} {
+      // Public read for sharing
+      allow read: if true;
+      
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- PRESENCE COLLECTION (PR21) ---
+    // Activity feed data - subject presence aggregates
+    match /presence/subjects/active/{subject} {
+      // Anyone can read aggregates (public feed data)
+      allow read: if true;
+      
+      // Only Cloud Functions can write (via admin SDK)
+      allow write: if false;
+    }
+
+    // --- CONSENTS COLLECTION (PR19) ---
+    // Consent audit log (compliance trail)
+    match /consents/{userId} {
+      // Users can read their own consent history
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Only Cloud Functions can write (via admin SDK)
+      allow write: if false;
+      
+      // Consent history subcollection
+      match /history/{logId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+    }
+
+    // --- REELS COLLECTION (PR19) ---
+    // Progress reels (shareable session highlights)
+    match /reels/{reelId} {
+      // Users can read their own reels
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      
+      // Only Cloud Functions can write (via admin SDK)
+      allow write: if false;
+    }
+    
+    // Allow public read for sharing (anyone with link can view)
+    match /reels/{reelId} {
+      allow get: if resource.data.status == 'ready';
+    }
+
+    // --- STUDY BUDDY CHALLENGES (PR23) ---
+    // Student→Student challenge sharing
+    match /challenges/{challengeId} {
+      // Creator and participant can read their challenges
+      allow read: if request.auth != null && 
+        (request.auth.uid == resource.data.creatorId || 
+         request.auth.uid == resource.data.participantId);
+      
+      // Only Cloud Functions can write (via admin SDK)
+      allow write: if false;
+    }
+
+    // --- COHORT ROOMS (PR27) ---
+    // Real-time cohort rooms; server-only writes
+    match /cohorts/{cohortId} {
+      // Participants can read cohort room
+      allow read: if request.auth != null && request.auth.uid in resource.data.participants;
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- LEADERBOARDS (PR27) ---
+    // Public read leaderboards; server-only writes
+    match /leaderboards/{subject}/{ageBand}/top {
+      // Anyone can read leaderboards
+      allow read: if true;
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
+    // --- FRAUD DETECTION (PR22) ---
+    // Anomaly scores, fraud queue, device/IP tracking (server-only)
+    
+    match /anomaly_scores/{userId} {
+      // Users can read their own anomaly score
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+    
+    match /fraud_queue/{queueId} {
+      // Only admins can read fraud queue
+      allow read: if request.auth != null && request.auth.token.admin == true;
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+    
+    match /device_mappings/{mappingId} {
+      // Server-only (privacy-sensitive)
+      allow read, write: if false;
+    }
+    
+    match /ip_signups/{eventId} {
+      // Server-only (privacy-sensitive)
+      allow read, write: if false;
+    }
+    
+    match /banned_users/{userId} {
+      // Users can check if they're banned
+      allow read: if request.auth != null;
+      // Only Cloud Functions can write
+      allow write: if false;
+    }
+
     // NOTE: Cloud Functions using admin SDK bypass all security rules
     // This allows server-side logic to write to any collection securely
   }

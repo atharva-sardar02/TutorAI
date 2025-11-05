@@ -349,14 +349,61 @@ export default function ChatRoomScreen() {
   }, [conversationId, currentUserId]);
 
   // Auto-scroll to bottom when messages load or new messages arrive
+  // Track the last message ID to ensure we scroll on actual new messages
+  const lastMessageId = useRef<string | null>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (!loading && allMessages.length > 0 && flashListRef.current) {
-      // Small delay to ensure FlashList is rendered
-      setTimeout(() => {
-        flashListRef.current?.scrollToIndex({ index: 0, animated: false });
-      }, 100);
+      const newestMessage = allMessages[0]; // First item is newest (sorted descending)
+      const isNewMessage = newestMessage.id !== lastMessageId.current;
+      
+      // Clear any pending scroll timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      
+      // Only scroll if we have a genuinely new message or initial load
+      if (isNewMessage || lastMessageId.current === null) {
+        lastMessageId.current = newestMessage.id;
+        
+        console.log('📜 Auto-scrolling to newest message:', {
+          messageId: newestMessage.id.substring(0, 8),
+          isAssistant: newestMessage.senderId === 'assistant',
+          hasConflict: !!newestMessage.meta?.conflict,
+          messageCount: allMessages.length,
+        });
+        
+        // Use scrollToOffset for more reliable scrolling to the very top
+        // FlashList displays messages in reverse, so offset 0 = newest message
+        scrollTimeoutRef.current = setTimeout(() => {
+          try {
+            flashListRef.current?.scrollToOffset({
+              offset: 0,
+              animated: false,
+            });
+          } catch (error) {
+            console.warn('Scroll failed, retrying with scrollToIndex:', error);
+            // Fallback to scrollToIndex if scrollToOffset fails
+            setTimeout(() => {
+              flashListRef.current?.scrollToIndex({ 
+                index: 0, 
+                animated: false,
+                viewPosition: 0,
+              });
+            }, 50);
+          }
+        }, 150); // Increased delay for complex assistant messages with cards
+      }
     }
-  }, [loading, allMessages.length]);
+    
+    // Cleanup timeout on unmount
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [loading, allMessages]);
 
   // Update header with conversation name and online indicator
   useEffect(() => {

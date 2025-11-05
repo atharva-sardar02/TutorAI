@@ -133,19 +133,44 @@ export async function registerForPushNotifications(userId: string): Promise<stri
 
 /**
  * Setup notification tap handler
- * Navigates to the conversation when user taps notification
+ * Navigates to the appropriate screen when user taps notification
  */
 export function setupNotificationTapHandler(): void {
   // Handle notification tap when app is in foreground/background
   Notifications.addNotificationResponseReceivedListener((response) => {
     const data = response.notification.request.content.data;
-    const conversationId = data?.conversationId as string;
-
-    if (conversationId) {
-      console.log('📱 Notification tapped, navigating to:', conversationId.substring(0, 12));
-      
-      // Navigate to conversation
-      router.push(`/chat/${conversationId}`);
+    const notificationType = data?.type as string;
+    
+    console.log('📱 Notification tapped', { type: notificationType });
+    
+    // Handle different notification types
+    if (notificationType === 'session_summary') {
+      // PR20: Session summary notification
+      const sessionId = data?.sessionId as string;
+      if (sessionId) {
+        console.log('📊 Navigating to session detail:', sessionId);
+        router.push({
+          pathname: '/sessionDetail',
+          params: { sessionId },
+        });
+      }
+    } else if (notificationType === 'progress_reel_ready') {
+      // PR19: Progress reel ready notification
+      const reelId = data?.reelId as string;
+      if (reelId) {
+        console.log('🎥 Navigating to progress reel:', reelId);
+        router.push({
+          pathname: '/progressReel',
+          params: { reelId },
+        });
+      }
+    } else {
+      // Default: message notification
+      const conversationId = data?.conversationId as string;
+      if (conversationId) {
+        console.log('💬 Navigating to conversation:', conversationId.substring(0, 12));
+        router.push(`/chat/${conversationId}`);
+      }
     }
   });
 
