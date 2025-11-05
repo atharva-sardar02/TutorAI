@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid2 as Grid, Box, Typography, Paper } from '@mui/material';
+import { Grid, Box, Typography, Paper } from '@mui/material';
 import { FunnelChart } from '@/components/Charts/FunnelChart';
 import { LoadingState } from '@/components/Common/LoadingState';
 import { ErrorState } from '@/components/Common/ErrorState';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid2 as Grid, Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Grid, Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { PercentileHistogram } from '@/components/Charts/PercentileHistogram';
 import { LoadingState } from '@/components/Common/LoadingState';
 import { ErrorState } from '@/components/Common/ErrorState';
