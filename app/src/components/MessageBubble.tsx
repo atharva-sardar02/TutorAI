@@ -85,6 +85,15 @@ export default function MessageBubble({
     return dayjs(date).format('h:mm A');
   };
 
+  const formatDuration = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    if (minutes === 0) {
+      return `${remainingSeconds}s`;
+    }
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
   const getStatusDisplay = () => {
     if (!isOwn) return null;
 
@@ -364,6 +373,33 @@ export default function MessageBubble({
               </Text>
             )}
           </View>
+        ) : message.type === 'recording' && message.recording ? (
+          /* Recording message */
+          <View style={styles.recordingContainer}>
+            <View style={styles.recordingHeader}>
+              <Text style={styles.recordingIcon}>
+                {message.recording.fileType === 'video' ? '🎥' : '🎤'}
+              </Text>
+              <View style={styles.recordingInfo}>
+                <Text style={[styles.recordingTitle, isOwn ? styles.ownText : styles.otherText]}>
+                  {message.recording.fileType === 'video' ? 'Video Lecture' : 'Audio Lecture'}
+                </Text>
+                {message.recording.duration && (
+                  <Text style={[styles.recordingDuration, isOwn ? styles.ownRecordingMeta : styles.otherRecordingMeta]}>
+                    {formatDuration(message.recording.duration)}
+                  </Text>
+                )}
+              </View>
+            </View>
+            <Text style={[styles.recordingStatus, isOwn ? styles.ownRecordingMeta : styles.otherRecordingMeta]}>
+              {message.recording.processedUrl ? '✓ Processed' : '⏳ Processing...'}
+            </Text>
+            {message.text && (
+              <Text style={[styles.text, isOwn ? styles.ownText : styles.otherText, styles.recordingCaption]}>
+                {message.text}
+              </Text>
+            )}
+          </View>
         ) : (
           /* Text message */
           <Text style={[styles.text, isOwn ? styles.ownText : styles.otherText]}>
@@ -513,6 +549,44 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
   },
   imageCaption: {
+    marginTop: 8,
+  },
+  recordingContainer: {
+    minWidth: 200,
+  },
+  recordingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  recordingIcon: {
+    fontSize: 32,
+    marginRight: 12,
+  },
+  recordingInfo: {
+    flex: 1,
+  },
+  recordingTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  recordingDuration: {
+    fontSize: 13,
+    opacity: 0.8,
+  },
+  recordingStatus: {
+    fontSize: 12,
+    opacity: 0.7,
+    marginTop: 4,
+  },
+  ownRecordingMeta: {
+    color: 'rgba(255, 255, 255, 0.9)',
+  },
+  otherRecordingMeta: {
+    color: '#666',
+  },
+  recordingCaption: {
     marginTop: 8,
   },
 });

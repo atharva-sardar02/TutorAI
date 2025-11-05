@@ -6,6 +6,7 @@ import AIQuickActions from './AIQuickActions';
 interface Props {
   onSend: (text: string) => void;
   onSendImage?: (imageUri: string) => void;
+  onSendRecording?: (uri: string, fileType: 'video' | 'audio') => void;
   onTyping?: () => void;
   onStopTyping?: () => void;
   placeholder?: string;
@@ -19,6 +20,7 @@ interface Props {
 export default function MessageInput({ 
   onSend, 
   onSendImage,
+  onSendRecording,
   onTyping, 
   onStopTyping, 
   placeholder = 'Type a message...',
@@ -109,6 +111,7 @@ export default function MessageInput({
         visible={showAttachmentModal}
         onClose={() => setShowAttachmentModal(false)}
         onSendImage={onSendImage}
+        onSendRecording={onSendRecording}
       />
 
       {/* AI Quick Actions modal */}

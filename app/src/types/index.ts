@@ -2,7 +2,7 @@ import { Timestamp } from "firebase/firestore";
 
 // Message types
 export type MessageStatus = "sending" | "sent" | "failed";
-export type MessageType = "text" | "image";
+export type MessageType = "text" | "image" | "recording";
 
 // AI/Assistant metadata types
 export interface EventMeta {
@@ -38,6 +38,16 @@ export interface ConflictMeta {
   }>;
 }
 
+// Recording metadata for Session Intelligence
+export interface RecordingMeta {
+  recordingId: string;
+  fileType: 'video' | 'audio';
+  storageUrl: string;
+  duration?: number; // in seconds
+  processedUrl?: string; // Will be set by Cloud Function after watermarking
+  transcriptId?: string; // Will be set after transcription
+}
+
 export interface MessageMeta {
   role?: 'assistant' | 'system' | 'user';
   type?: 'event' | 'deadline' | 'ai_loading'; // Type of assistant message/card
@@ -63,6 +73,7 @@ export interface Message {
     width: number;
     height: number;
   };
+  recording?: RecordingMeta; // Session Intelligence recording metadata
   clientTimestamp: Timestamp; // Optimistic ordering
   serverTimestamp: Timestamp | null; // Authoritative
   status: MessageStatus;

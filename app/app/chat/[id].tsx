@@ -20,6 +20,7 @@ import ConnectionBanner from "@/components/ConnectionBanner";
 import OnlineIndicator from "@/components/OnlineIndicator";
 import TypingIndicator from "@/components/TypingIndicator";
 import ImageUploadProgress from "@/components/ImageUploadProgress";
+import UploadProgressBar from "@/components/recordings/UploadProgressBar";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { usePresence } from "@/hooks/usePresence";
 import { useTypingIndicator } from "@/hooks/useTypingIndicator";
@@ -28,6 +29,7 @@ import { useMessages } from "@/hooks/useMessages";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 import { useThreadStatus } from "@/hooks/useThreadStatus";
 import { uploadImage } from "@/services/mediaService";
+import { uploadRecording } from "@/services/lectureService";
 import { Conversation } from "@/types/index";
 import StatusChip from "@/components/StatusChip";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -40,6 +42,7 @@ export default function ChatRoomScreen() {
   const [otherUserData, setOtherUserData] = useState<any>(null); // Store full user data for role context
   const [currentUserData, setCurrentUserData] = useState<any>(null); // Current user's role data
   const [uploadingImages, setUploadingImages] = useState<Map<string, number>>(new Map()); // messageId -> progress
+  const [uploadingRecordings, setUploadingRecordings] = useState<Map<string, number>>(new Map()); // messageId -> progress
   const [optimisticMessages, setOptimisticMessages] = useState<Message[]>([]); // Local queue for offline messages
   const [showRetryBanner, setShowRetryBanner] = useState(false);
   const previousOnlineStatus = useRef<boolean>(true);
@@ -656,6 +659,110 @@ export default function ChatRoomScreen() {
     }
   };
 
+  const handleSendRecording = async (uri: string, fileType: 'video' | 'audio') => {
+    const recordingId = newMessageId();
+    const messageId = newMessageId();
+    
+    console.log('🎥 Sending recording message:', messageId.substring(0, 8), fileType);
+
+    try {
+      // Create optimistic message
+      const optimisticMessage: Message = {
+        id: messageId,
+        conversationId,
+        senderId: currentUserId,
+        type: 'recording',
+        text: `Uploaded ${fileType === 'video' ? 'video' : 'audio'} lecture`,
+        recording: {
+          recordingId,
+          fileType,
+          storageUrl: '', // Will be filled after upload
+        },
+        status: 'sending',
+        clientTimestamp: Timestamp.now(),
+        serverTimestamp: null,
+        retryCount: 0,
+        readBy: [currentUserId],
+        readCount: 1,
+      };
+      
+      // Add to optimistic state IMMEDIATELY
+      setOptimisticMessages(prev => [...prev, optimisticMessage]);
+      console.log('📤 Added recording message to optimistic queue:', messageId.substring(0, 8));
+      
+      // Track upload progress
+      setUploadingRecordings(new Map(uploadingRecordings.set(messageId, 0)));
+      
+      // Upload recording
+      const result = await uploadRecording(
+        uri,
+        conversationId,
+        recordingId,
+        fileType,
+        (progress) => {
+          setUploadingRecordings(prev => new Map(prev).set(messageId, progress.progress));
+        }
+      );
+      
+      console.log('✅ Recording uploaded successfully');
+      
+      // Update message with recording metadata
+      const finalMessage: Message = {
+        ...optimisticMessage,
+        recording: {
+          recordingId,
+          fileType,
+          storageUrl: result.url,
+          duration: result.duration,
+        },
+      };
+      
+      // Update optimistic message
+      setOptimisticMessages(prev =>
+        prev.map(m => m.id === messageId ? finalMessage : m)
+      );
+      
+      // Send to Firestore
+      const sendResult = await sendMessageWithRetry(conversationId, finalMessage);
+      
+      if (sendResult.isOffline) {
+        console.log('📦 Recording message queued offline - will send when connection restored');
+      } else if (sendResult.success) {
+        console.log('✅ Recording message sent successfully');
+      } else {
+        console.warn('⚠️ Recording message send failed after retries');
+        setOptimisticMessages(prev =>
+          prev.map(m => m.id === messageId ? { ...m, status: 'failed' as MessageStatus } : m)
+        );
+      }
+      
+      // Clear upload tracking
+      setUploadingRecordings(prev => {
+        const next = new Map(prev);
+        next.delete(messageId);
+        return next;
+      });
+      
+    } catch (error: any) {
+      console.error('❌ Recording upload failed:', error);
+      Alert.alert('Upload Failed', error.message || 'Failed to upload recording. Please try again.');
+      
+      // Mark message as failed
+      setOptimisticMessages(prev =>
+        prev.map(msg =>
+          msg.id === messageId ? { ...msg, status: 'failed' as MessageStatus } : msg
+        )
+      );
+      
+      // Clean up upload progress
+      setUploadingRecordings(prev => {
+        const next = new Map(prev);
+        next.delete(messageId);
+        return next;
+      });
+    }
+  };
+
   const handleRetry = async (messageId: string) => {
     // Check both Firestore messages and optimistic messages
     const failedMessage = allMessages.find(m => m.id === messageId);
@@ -796,14 +903,24 @@ export default function ChatRoomScreen() {
         <ImageUploadProgress key={messageId} progress={progress} />
       ))}
 
+      {/* Show recording upload progress */}
+      {Array.from(uploadingRecordings.entries()).map(([messageId, progress]) => (
+        <UploadProgressBar 
+          key={messageId} 
+          progress={progress} 
+          fileName="Recording" 
+        />
+      ))}
+
       <TypingIndicator conversationId={conversationId} currentUserId={currentUserId} />
 
       <MessageInput 
         onSend={handleSend}
         onSendImage={handleSendImage}
+        onSendRecording={handleSendRecording}
         onTyping={startTyping}
         onStopTyping={stopTyping}
-        disabled={uploadingImages.size > 0}
+        disabled={uploadingImages.size > 0 || uploadingRecordings.size > 0}
       />
     </KeyboardAvoidingView>
   );
