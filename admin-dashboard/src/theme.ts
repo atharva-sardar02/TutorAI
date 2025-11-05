@@ -1,20 +1,20 @@
 import { createTheme } from '@mui/material/styles';
 
 // TutorAI Admin Dashboard Theme
-// Spotify-inspired design with green primary color
+// iOS-inspired design with blue primary color (matching mobile app)
 export const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#1DB954', // Spotify green (matches app percentile cards)
-      light: '#1ed760',
-      dark: '#169c46',
+      main: '#007AFF', // iOS blue (matches mobile app buttons)
+      light: '#4da2ff',
+      dark: '#0055b3',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#007AFF', // iOS blue (matches app)
-      light: '#4da2ff',
-      dark: '#0055b3',
+      main: '#1DB954', // Spotify green (accent color)
+      light: '#1ed760',
+      dark: '#169c46',
       contrastText: '#ffffff',
     },
     error: {
