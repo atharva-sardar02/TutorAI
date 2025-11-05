@@ -125,6 +125,15 @@ export interface User {
   };
   presence: UserPresence;
   createdAt?: Timestamp;
+  
+  // Percentile stats (replaces leaderboards)
+  stats?: {
+    monthlyXp: number;
+    monthlyChallenges: number;
+    monthlyPercentile: number; // 0-100, or -1 if insufficient data
+    monthStart: Timestamp;
+    lastUpdated: Timestamp;
+  };
 }
 
 // Tutor Code Registry

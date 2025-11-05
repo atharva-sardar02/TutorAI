@@ -11,7 +11,6 @@ import { getOrchestratorDecision } from '@/services/growth/orchestratorService';
 import { issueReward, getUserBalance } from '@/services/growth/incentivesService';
 import { TutorCardModal } from '@/components/growth/TutorCardModal';
 import ActivityFeed from '@/components/ActivityFeed';
-import { LeaderboardCard } from '@/components/growth/LeaderboardCard';
 import { ProgressStoryCard } from '@/components/growth/ProgressStoryCard';
 import { StudyBuddyChallengeModal } from '@/components/growth/StudyBuddyChallengeModal';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -208,11 +207,6 @@ export default function OverviewScreen() {
 
       {/* PR19+: Progress Story Card (Spotify Wrapped-style) */}
       <ProgressStoryCard />
-
-      {/* PR27: Mini-Leaderboard */}
-      <View style={{ padding: 10 }}>
-        <LeaderboardCard />
-      </View>
 
       {/* PR15, PR16, PR25, PR18 Test Buttons - Remove after testing */}
       <View style={styles.testButtonContainer}>

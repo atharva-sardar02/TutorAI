@@ -913,10 +913,11 @@ export const afterSummary = onDocumentCreated({
 // PR19: Progress Reels - Consent Revocation Trigger
 export { onConsentRevoked } from './growth/onConsentRevoked';
 
-// PR27: Cohort Rooms + Leaderboards
+// PR27: Cohort Rooms
 export { joinCohortRoom, leaveCohortRoom } from './growth/cohortRoomService';
-export { computeLeaderboards } from './growth/leaderboardService';
-export { setLeaderboardOptOut } from './growth/privacySettings';
+
+// Percentile System (replaces leaderboards)
+export { computeMonthlyPercentiles } from './growth/percentileService';
 
 // PR23: Study Buddy Challenge
 export {

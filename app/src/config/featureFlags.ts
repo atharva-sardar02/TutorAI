@@ -61,9 +61,8 @@ export const GROWTH_FEATURE_FLAGS: GrowthFeatureFlags = {
     refreshInterval: 5, // minutes - matches Cloud Function schedule
   },
 
-  // PR27: Cohort Rooms & Leaderboards
+  // PR27: Cohort Rooms
   cohortRooms: { enabled: true },
-  leaderboards: { enabled: true },
   
   // PR22: Fraud Detection
   fraud: {

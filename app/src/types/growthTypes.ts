@@ -100,9 +100,6 @@ export interface GrowthFeatureFlags {
   cohortRooms: {               // PR27 - Cohort Rooms
     enabled: boolean;
   };
-  leaderboards: {              // PR27 - Mini-Leaderboards
-    enabled: boolean;
-  };
   fraud: {                     // PR22 - Fraud Detection
     detectionEnabled: boolean;
     captchaEnabled: boolean;

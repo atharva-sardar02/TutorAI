@@ -9,6 +9,7 @@ import { useConversations } from '@/hooks/useConversations';
 import InsightCard from '@/components/InsightCard';
 import InsightsGrid from '@/components/InsightsGrid';
 import EmptyState from '@/components/EmptyState';
+import { PercentileCard } from '@/components/profile/PercentileCard';
 import dayjs from 'dayjs';
 import { Ionicons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
@@ -138,6 +139,9 @@ export default function ParentOverview({ userData }: ParentOverviewProps) {
           </Text>
           <Text style={styles.subheading}>Stay informed and on track</Text>
         </View>
+
+        {/* Percentile Card */}
+        <PercentileCard role="parent" />
 
         {/* Next Lesson Card */}
         {insights.nextLesson && (

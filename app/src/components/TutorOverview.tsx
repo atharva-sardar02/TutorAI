@@ -10,6 +10,7 @@ import InsightCard from '@/components/InsightCard';
 import InsightsGrid from '@/components/InsightsGrid';
 import ConversationListItem from '@/components/ConversationListItem';
 import EmptyState from '@/components/EmptyState';
+import { PercentileCard } from '@/components/profile/PercentileCard';
 import dayjs from 'dayjs';
 import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from '@expo/vector-icons';
@@ -162,6 +163,9 @@ export default function TutorOverview({ userData }: TutorOverviewProps) {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Percentile Card */}
+        <PercentileCard role="tutor" />
 
         {/* Insights Grid */}
         <View style={styles.insightsSection}>
