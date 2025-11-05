@@ -74,7 +74,7 @@ export function PercentileCard({ role }: PercentileCardProps) {
     );
   }
 
-  const gradientColors = isDark
+  const gradientColors: [string, string, ...string[]] = isDark
     ? ['#1DB954', '#1ed760', '#1DB954'] // Spotify green gradient
     : ['#1DB954', '#1ed760', '#1DB954'];
 
