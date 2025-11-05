@@ -946,4 +946,5 @@ export { setupAdminUser } from './admin/setupAdmin';
 
 // Admin Dashboard User Management (PR-ADMIN-06)
 export { getUserProfile } from './admin/userProfileApi';
+export { getSystemHealth } from './admin/systemHealthApi';
 
