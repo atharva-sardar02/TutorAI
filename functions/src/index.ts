@@ -736,6 +736,79 @@ export const subjectPresenceAggregator = onSchedule({
 export { transcribeSession } from './transcription/transcribeSession';
 
 /**
+ * Session Intelligence: Recording Transcription (SI-04)
+ * Triggered when recordings are uploaded to /recordings/{conversationId}/{recordingId}.{ext}
+ */
+export { transcribeRecording } from './si/transcribeRecording';
+
+/**
+ * Session Intelligence: After Transcript Created (SI-05)
+ * Triggered when a SI recording transcript is created
+ * Generates daily summary and appends to daily document
+ */
+export const afterRecordingTranscript = onDocumentCreated({
+  document: 'transcripts/{conversationId}/recordings/{recordingId}',
+  region: 'us-central1',
+  timeoutSeconds: 60,
+  memory: '512MiB',
+}, async (event) => {
+  const conversationId = event.params.conversationId;
+  const recordingId = event.params.recordingId;
+  const transcript = event.data?.data();
+  
+  if (!transcript) {
+    logger.error('No transcript data found', { conversationId, recordingId });
+    return;
+  }
+  
+  if (transcript.status !== 'complete') {
+    logger.info('Skipping incomplete transcript', {
+      conversationId,
+      recordingId,
+      status: transcript.status,
+    });
+    return;
+  }
+  
+  logger.info('📝 Recording transcript created, generating daily summary', {
+    conversationId,
+    recordingId,
+  });
+  
+  try {
+    const { processDailySummary } = await import('./si/dailySummarizer');
+    await processDailySummary(conversationId, recordingId);
+    
+    logger.info('✅ Daily summary processing complete', { conversationId, recordingId });
+  } catch (error: any) {
+    logger.error('❌ Daily summary processing failed', {
+      conversationId,
+      recordingId,
+      error: error.message,
+      stack: error.stack,
+    });
+  }
+});
+
+/**
+ * Session Intelligence: Daily Message Aggregator (SI-05B)
+ * Scheduled to run end-of-day to include text messages in daily summaries
+ */
+export { aggregateDailyMessages } from './si/messageAggregator';
+
+/**
+ * Session Intelligence: Weekly Aggregator (SI-07)
+ * Runs every Sunday at 6 PM to aggregate weekly summaries
+ */
+export { aggregateWeeklySummaries } from './si/weeklyAggregator';
+
+/**
+ * Session Intelligence: Cleanup & Retention (SI-11)
+ * Scheduled and manual cleanup of old recordings
+ */
+export { scheduledRecordingCleanup, manualRecordingCleanup } from './si/cleanup';
+
+/**
  * Cloud Function: After Transcript Created (PR20)
  * Triggered when a transcript document is created
  * Generates AI summary using GPT-4o-mini

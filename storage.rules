@@ -22,5 +22,15 @@ service firebase.storage {
     match /conversations/{cid}/messages/{file} {
       allow read, write: if request.auth != null;
     }
+
+    // Session Intelligence: /recordings/{cid}/{file}
+    // Lecture recordings (video/audio) uploaded by tutors
+    match /recordings/{cid}/{file} {
+      // Allow authenticated users to read (will be validated by Firestore rules)
+      allow read: if request.auth != null;
+      
+      // Allow authenticated users to write (conversation participant check in app logic)
+      allow write: if request.auth != null;
+    }
   }
 }

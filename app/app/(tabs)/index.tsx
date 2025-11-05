@@ -14,7 +14,10 @@ import ActivityFeed from '@/components/ActivityFeed';
 import { LeaderboardCard } from '@/components/growth/LeaderboardCard';
 import { ProgressStoryCard } from '@/components/growth/ProgressStoryCard';
 import { StudyBuddyChallengeModal } from '@/components/growth/StudyBuddyChallengeModal';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
+import { WeeklyReelCard } from '@/components/si/WeeklyReelCard';
+import { useWeeklySummaries, markWeeklyReelAsViewed } from '@/hooks/useWeeklySummaries';
+import { ProgressReelModal } from '@/components/growth/ProgressReelModal';
 
 export default function OverviewScreen() {
   const { user } = useAuth();
@@ -27,6 +30,11 @@ export default function OverviewScreen() {
   const [challengeSubject, setChallengeSubject] = useState('');
   const [challengeTopic, setChallengeTopic] = useState('');
   const [challengeDifficulty, setChallengeDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+  
+  // SI-09: Weekly reel state
+  const { reels: weeklyReels, loading: reelsLoading } = useWeeklySummaries(user?.uid, 5);
+  const [selectedWeeklyReel, setSelectedWeeklyReel] = useState<any>(null);
+  const [showWeeklyReelModal, setShowWeeklyReelModal] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -165,9 +173,36 @@ export default function OverviewScreen() {
     }
   };
 
+  // SI-09: Handle weekly reel press
+  const handleWeeklyReelPress = async (reel: any) => {
+    // Mark as viewed
+    try {
+      await markWeeklyReelAsViewed(reel.reelId);
+    } catch (error) {
+      console.error('Failed to mark reel as viewed:', error);
+    }
+    
+    // Show reel modal
+    setSelectedWeeklyReel(reel);
+    setShowWeeklyReelModal(true);
+  };
+
   // Render role-specific overview
   return (
     <ScrollView style={{ flex: 1 }}>
+      {/* SI-09: Weekly Reels */}
+      {weeklyReels.length > 0 && (
+        <View style={{ marginTop: 16 }}>
+          {weeklyReels.map((reel) => (
+            <WeeklyReelCard
+              key={reel.reelId}
+              reel={reel}
+              onPress={handleWeeklyReelPress}
+            />
+          ))}
+        </View>
+      )}
+
       {/* PR21: Activity Feed */}
       <ActivityFeed />
 
@@ -234,6 +269,18 @@ export default function OverviewScreen() {
           onChallengeCreated={(challenge) => {
             console.log('Challenge created from Progress Reel:', challenge.challengeId);
             setShowChallengeModal(false);
+          }}
+        />
+      )}
+      
+      {/* SI-09: Weekly Reel Modal */}
+      {selectedWeeklyReel && (
+        <ProgressReelModal
+          visible={showWeeklyReelModal}
+          reel={selectedWeeklyReel}
+          onClose={() => {
+            setShowWeeklyReelModal(false);
+            setSelectedWeeklyReel(null);
           }}
         />
       )}

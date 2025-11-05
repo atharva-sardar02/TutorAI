@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
+import { executePickerWithLock } from '@/utils/pickerState';
+import { usePickerState } from '@/hooks/usePickerState';
 
 interface Props {
   visible: boolean;
@@ -22,126 +24,156 @@ interface Props {
 export default function AttachmentModal({ visible, onClose, onSendImage, onSendRecording }: Props) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const { isPickerActive } = usePickerState();
 
   const handleTakePhoto = async () => {
-    onClose();
+    console.log('📸 handleTakePhoto called');
     
     if (!onSendImage) {
       Alert.alert('Not Available', 'Image sending is not available');
       return;
     }
 
+    onClose();
+    
     try {
-      // Request camera permissions
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      
-      if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'We need camera permissions to take photos');
-        return;
-      }
+      const result = await executePickerWithLock('camera', async () => {
+        // Request camera permissions
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        
+        if (status !== 'granted') {
+          Alert.alert('Permission Denied', 'We need camera permissions to take photos');
+          return null;
+        }
 
-      // Launch camera
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        quality: 1,
+        // Launch camera
+        return await ImagePicker.launchCameraAsync({
+          allowsEditing: true,
+          quality: 1,
+        });
       });
 
-      if (!result.canceled && result.assets[0]) {
+      if (result && !result.canceled && result.assets[0]) {
+        console.log('✅ Photo selected:', result.assets[0].uri.substring(0, 50));
         onSendImage(result.assets[0].uri);
       }
     } catch (error: any) {
-      console.error('Camera error:', error);
-      Alert.alert('Error', 'Failed to open camera. Please try again.');
+      console.error('❌ Camera error:', error);
+      // Don't show alert for user cancellation
+      if (!error.message?.includes('User cancelled')) {
+        Alert.alert('Error', 'Failed to open camera. Please try again.');
+      }
     }
   };
 
   const handleChooseFromGallery = async () => {
-    onClose();
+    console.log('🖼️ handleChooseFromGallery called');
     
     if (!onSendImage) {
       Alert.alert('Not Available', 'Image sending is not available');
       return;
     }
 
+    onClose();
+    
     try {
-      // Request permissions
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'We need photo library permissions to select images');
-        return;
-      }
+      const result = await executePickerWithLock('gallery', async () => {
+        // Request permissions
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        
+        if (status !== 'granted') {
+          Alert.alert('Permission Denied', 'We need photo library permissions to select images');
+          return null;
+        }
 
-      // Pick image
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        quality: 1,
+        // Pick image
+        return await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          quality: 1,
+        });
       });
 
-      if (!result.canceled && result.assets[0]) {
+      if (result && !result.canceled && result.assets[0]) {
+        console.log('✅ Image selected:', result.assets[0].uri.substring(0, 50));
         onSendImage(result.assets[0].uri);
       }
     } catch (error: any) {
-      console.error('Image picker error:', error);
-      Alert.alert('Error', 'Failed to pick image. Please try again.');
+      console.error('❌ Image picker error:', error);
+      if (!error.message?.includes('User cancelled')) {
+        Alert.alert('Error', 'Failed to pick image. Please try again.');
+      }
     }
   };
 
   const handleRecordVideo = async () => {
-    onClose();
+    console.log('🎥 handleRecordVideo called');
     
     if (!onSendRecording) {
       Alert.alert('Not Available', 'Recording upload is not available');
       return;
     }
 
+    onClose();
+    
     try {
-      // Request permissions
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'We need permissions to access videos');
-        return;
-      }
+      const result = await executePickerWithLock('video', async () => {
+        // Request permissions
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        
+        if (status !== 'granted') {
+          Alert.alert('Permission Denied', 'We need permissions to access videos');
+          return null;
+        }
 
-      // Pick video
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-        quality: 1,
-        videoMaxDuration: 3600, // 1 hour max
+        // Pick video
+        return await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+          quality: 1,
+          videoMaxDuration: 3600, // 1 hour max
+        });
       });
 
-      if (!result.canceled && result.assets[0]) {
+      if (result && !result.canceled && result.assets[0]) {
+        console.log('✅ Video selected:', result.assets[0].uri.substring(0, 50));
         onSendRecording(result.assets[0].uri, 'video');
       }
     } catch (error: any) {
-      console.error('Video picker error:', error);
-      Alert.alert('Error', 'Failed to select video. Please try again.');
+      console.error('❌ Video picker error:', error);
+      if (!error.message?.includes('User cancelled')) {
+        Alert.alert('Error', 'Failed to select video. Please try again.');
+      }
     }
   };
 
   const handleAttachAudio = async () => {
-    onClose();
+    console.log('🎤 handleAttachAudio called');
     
     if (!onSendRecording) {
       Alert.alert('Not Available', 'Recording upload is not available');
       return;
     }
 
+    onClose();
+    
     try {
-      // Use document picker for audio files
-      const result = await DocumentPicker.getDocumentAsync({
-        type: 'audio/*',
-        copyToCacheDirectory: true,
+      const result = await executePickerWithLock('audio', async () => {
+        // Use document picker for audio files
+        return await DocumentPicker.getDocumentAsync({
+          type: 'audio/*',
+          copyToCacheDirectory: true,
+        });
       });
 
-      if (!result.canceled && result.assets && result.assets[0]) {
+      if (result && !result.canceled && result.assets && result.assets[0]) {
+        console.log('✅ Audio selected:', result.assets[0].uri.substring(0, 50));
         onSendRecording(result.assets[0].uri, 'audio');
       }
     } catch (error: any) {
-      console.error('Audio picker error:', error);
-      Alert.alert('Error', 'Failed to select audio. Please try again.');
+      console.error('❌ Audio picker error:', error);
+      if (!error.message?.includes('User cancelled')) {
+        Alert.alert('Error', 'Failed to select audio. Please try again.');
+      }
     }
   };
 
@@ -160,9 +192,10 @@ export default function AttachmentModal({ visible, onClose, onSendImage, onSendR
             </Text>
 
             <TouchableOpacity
-              style={[styles.option, isDark && styles.optionDark]}
+              style={[styles.option, isDark && styles.optionDark, isPickerActive && styles.optionDisabled]}
               onPress={handleTakePhoto}
-              activeOpacity={0.7}
+              disabled={isPickerActive}
+              activeOpacity={isPickerActive ? 1 : 0.7}
             >
               <View style={[styles.optionIcon, styles.cameraIcon]}>
                 <Text style={styles.optionIconText}>📷</Text>
@@ -178,9 +211,10 @@ export default function AttachmentModal({ visible, onClose, onSendImage, onSendR
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.option, isDark && styles.optionDark]}
+              style={[styles.option, isDark && styles.optionDark, isPickerActive && styles.optionDisabled]}
               onPress={handleChooseFromGallery}
-              activeOpacity={0.7}
+              disabled={isPickerActive}
+              activeOpacity={isPickerActive ? 1 : 0.7}
             >
               <View style={[styles.optionIcon, styles.galleryIcon]}>
                 <Text style={styles.optionIconText}>🖼️</Text>
@@ -196,9 +230,10 @@ export default function AttachmentModal({ visible, onClose, onSendImage, onSendR
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.option, isDark && styles.optionDark]}
+              style={[styles.option, isDark && styles.optionDark, isPickerActive && styles.optionDisabled]}
               onPress={handleRecordVideo}
-              activeOpacity={0.7}
+              disabled={isPickerActive}
+              activeOpacity={isPickerActive ? 1 : 0.7}
             >
               <View style={[styles.optionIcon, styles.videoIcon]}>
                 <Text style={styles.optionIconText}>🎥</Text>
@@ -214,9 +249,10 @@ export default function AttachmentModal({ visible, onClose, onSendImage, onSendR
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.option, isDark && styles.optionDark]}
+              style={[styles.option, isDark && styles.optionDark, isPickerActive && styles.optionDisabled]}
               onPress={handleAttachAudio}
-              activeOpacity={0.7}
+              disabled={isPickerActive}
+              activeOpacity={isPickerActive ? 1 : 0.7}
             >
               <View style={[styles.optionIcon, styles.audioIcon]}>
                 <Text style={styles.optionIconText}>🎤</Text>
@@ -287,6 +323,9 @@ const styles = StyleSheet.create({
   },
   optionDark: {
     backgroundColor: '#2c2c2e',
+  },
+  optionDisabled: {
+    opacity: 0.5,
   },
   optionIcon: {
     width: 50,

@@ -420,10 +420,16 @@ export default function ChatRoomScreen() {
         // Use fetched display name or fallback
         title = otherUserName || 'Chat';
         
-        // For direct chats, show online indicator and tappable name
+        // For direct chats, show online indicator, recordings button, and tappable name
         if (otherUserId) {
           headerRight = () => (
-            <View style={{ marginRight: 15 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15, gap: 12 }}>
+              <TouchableOpacity
+                onPress={() => router.push(`/recordings/${conversationId}`)}
+                style={{ padding: 4 }}
+              >
+                <Text style={{ fontSize: 20 }}>🎥</Text>
+              </TouchableOpacity>
               <OnlineIndicator userId={otherUserId} size={12} />
             </View>
           );
@@ -496,14 +502,21 @@ export default function ChatRoomScreen() {
           </TouchableOpacity>
         );
 
-        // Add info icon to header right for groups
+        // Add info icon and recordings button to header right for groups
         headerRight = () => (
-          <TouchableOpacity
-            onPress={() => router.push(`/groupInfo/${conversationId}`)}
-            style={{ marginRight: 15 }}
-          >
-            <Text style={{ fontSize: 24, color: '#007AFF' }}>ⓘ</Text>
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 15, gap: 12 }}>
+            <TouchableOpacity
+              onPress={() => router.push(`/recordings/${conversationId}`)}
+              style={{ padding: 4 }}
+            >
+              <Text style={{ fontSize: 20 }}>🎥</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push(`/groupInfo/${conversationId}`)}
+            >
+              <Text style={{ fontSize: 24, color: '#007AFF' }}>ⓘ</Text>
+            </TouchableOpacity>
+          </View>
         );
       }
 
