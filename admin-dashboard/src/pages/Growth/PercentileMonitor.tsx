@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Typography, Paper, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import { PercentileHistogram } from '@/components/Charts/PercentileHistogram';
 import { LoadingState } from '@/components/Common/LoadingState';
 import { ErrorState } from '@/components/Common/ErrorState';

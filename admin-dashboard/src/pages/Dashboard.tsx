@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Typography, Paper, Box, List, ListItem, ListItemText, Chip } from '@mui/material';
+import { Typography, Paper, Box, List, ListItem, ListItemText, Chip } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import { People, TrendingUp, Science, Security } from '@mui/icons-material';
 import { MetricCard } from '@/components/Cards/MetricCard';
 import { StatCard } from '@/components/Cards/StatCard';
