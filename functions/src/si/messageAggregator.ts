@@ -66,8 +66,8 @@ export async function aggregateMessagesForDate(
     
     // Filter to text messages only, exclude assistant/system messages
     const textMessages = messagesSnapshot.docs
-      .map(doc => ({ id: doc.id, ...doc.data() }))
-      .filter(msg => 
+      .map(doc => ({ id: doc.id, ...doc.data() } as any))
+      .filter((msg: any) => 
         msg.type === 'text' && 
         msg.senderId !== 'assistant' &&
         msg.text && 

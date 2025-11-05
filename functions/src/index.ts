@@ -941,3 +941,6 @@ export { approveFraudItem, rejectFraudItem } from './fraud/fraudQueue';
 // PR31: Compliance & DSR
 export { exportUserDataEndpoint, deleteUserAccountEndpoint } from './compliance/dsrHandler';
 
+// Admin Dashboard Setup (ONE-TIME USE - REMOVE AFTER SETUP)
+export { setupAdminUser } from './admin/setupAdmin';
+

@@ -60,13 +60,9 @@ function SessionIntelPage() {
   );
 }
 
-function FraudPage() {
-  return <div style={{ padding: '20px' }}><h2>Fraud Detection</h2><p>Coming soon in PR-ADMIN-05</p></div>;
-}
-
-function ExperimentsPage() {
-  return <div style={{ padding: '20px' }}><h2>Experiments</h2><p>Coming soon in PR-ADMIN-05</p></div>;
-}
+// Fraud & Experiments pages
+import { FraudQueue } from './pages/Fraud/FraudQueue';
+import { ExperimentList } from './pages/Experiments/ExperimentList';
 
 function SystemPage() {
   return <div style={{ padding: '20px' }}><h2>System & Health</h2><p>Coming soon in PR-ADMIN-06</p></div>;
@@ -193,7 +189,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MainLayout>
-                      <FraudPage />
+                      <FraudQueue />
                     </MainLayout>
                   </ProtectedRoute>
                 }
@@ -203,7 +199,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MainLayout>
-                      <ExperimentsPage />
+                      <ExperimentList />
                     </MainLayout>
                   </ProtectedRoute>
                 }

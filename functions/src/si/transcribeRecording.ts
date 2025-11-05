@@ -12,7 +12,7 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { OpenAI } from 'openai';
 import * as logger from 'firebase-functions/logger';
-import { logSIEvent, startTimer, elapsedMs, categorizeError } from './analyticsLogger';
+// import { logSIEvent, startTimer, elapsedMs, categorizeError } from './analyticsLogger';
 
 // Lazy-load OpenAI client to avoid initialization errors during deployment
 let openaiClient: OpenAI | null = null;

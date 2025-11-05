@@ -187,7 +187,7 @@ async function deleteFromStorage(urlOrPath: string): Promise<void> {
 export const scheduledRecordingCleanup = functions
   .runWith({
     timeoutSeconds: 540, // 9 minutes
-    memory: '512MiB',
+    memory: '512MB',
   })
   .pubsub
   .schedule('0 2 * * *') // Every day at 2 AM
@@ -222,7 +222,7 @@ export const scheduledRecordingCleanup = functions
 export const manualRecordingCleanup = functions
   .runWith({
     timeoutSeconds: 540,
-    memory: '512MiB',
+    memory: '512MB',
   })
   .https
   .onCall(async (data, context) => {
