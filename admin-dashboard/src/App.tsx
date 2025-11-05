@@ -19,9 +19,26 @@ const queryClient = new QueryClient({
   },
 });
 
-// Placeholder pages for routes (will be implemented in future PRs)
+// Growth pages
+import { KFactorDashboard } from './pages/Growth/KFactorDashboard';
+import { FunnelMetrics } from './pages/Growth/FunnelMetrics';
+import { RetentionMetrics } from './pages/Growth/RetentionMetrics';
+import { PercentileMonitor } from './pages/Growth/PercentileMonitor';
+
+// Placeholder page for growth overview
 function GrowthPage() {
-  return <div style={{ padding: '20px' }}><h2>Growth Metrics</h2><p>Coming soon in PR-ADMIN-03</p></div>;
+  return (
+    <div style={{ padding: '20px' }}>
+      <h2>Growth Metrics Overview</h2>
+      <p>Select a metric from the sidebar:</p>
+      <ul>
+        <li><a href="/growth/k-factor">K-Factor Dashboard</a></li>
+        <li><a href="/growth/funnel">Conversion Funnel</a></li>
+        <li><a href="/growth/retention">Retention Analysis</a></li>
+        <li><a href="/growth/percentile">Percentile Monitor</a></li>
+      </ul>
+    </div>
+  );
 }
 
 function SessionIntelPage() {
@@ -72,6 +89,46 @@ function App() {
                   <ProtectedRoute>
                     <MainLayout>
                       <GrowthPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/growth/k-factor"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <KFactorDashboard />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/growth/funnel"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <FunnelMetrics />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/growth/retention"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <RetentionMetrics />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/growth/percentile"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <PercentileMonitor />
                     </MainLayout>
                   </ProtectedRoute>
                 }
