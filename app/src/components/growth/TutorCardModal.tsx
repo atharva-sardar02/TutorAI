@@ -90,7 +90,7 @@ export function TutorCardModal({ visible, tutorId, onClose }: TutorCardModalProp
       }
 
       // Download image to local file system
-      const documentDir = FileSystem.documentDirectory || FileSystem.cacheDirectory || '';
+      const documentDir = (FileSystem as any).documentDirectory || (FileSystem as any).cacheDirectory || '';
       if (!documentDir) {
         throw new Error('No document directory available');
       }

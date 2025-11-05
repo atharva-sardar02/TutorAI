@@ -385,7 +385,7 @@ export default function ChatRoomScreen() {
           } catch (error) {
             console.warn('Scroll failed, retrying with scrollToIndex:', error);
             // Fallback to scrollToIndex if scrollToOffset fails
-            const timeout = setTimeout(() => {
+            setTimeout(() => {
               flashListRef.current?.scrollToIndex({ 
                 index: 0, 
                 animated: false,
@@ -393,7 +393,7 @@ export default function ChatRoomScreen() {
               });
             }, 50);
           }
-        }, 150); // Increased delay for complex assistant messages with cards
+        }, 150) as any; // Increased delay for complex assistant messages with cards
       }
     }
     

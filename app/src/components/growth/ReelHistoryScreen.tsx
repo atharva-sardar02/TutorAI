@@ -40,7 +40,7 @@ export default function ReelHistoryScreen() {
       item.sentiment === 'positive' ? '🎉' :
       item.sentiment === 'neutral' ? '📚' : '💪';
     
-    const gradientColors = 
+    const gradientColors: [string, string, ...string[]] = 
       item.qualityScore >= 90 ? ['#667eea', '#764ba2'] :
       item.qualityScore >= 80 ? ['#f093fb', '#f5576c'] :
       ['#4facfe', '#00f2fe'];

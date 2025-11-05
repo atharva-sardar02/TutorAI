@@ -107,6 +107,7 @@ export interface GrowthFeatureFlags {
     tutorCard: { enabled: boolean };          // PR18
     progressReel: { enabled: boolean };       // PR19
     studyBuddy: { enabled: boolean };         // PR23
+    parentChildChallenge: { enabled: boolean }; // PR30
     parentPod: { enabled: boolean };          // PR24
     tutorPeer: { enabled: boolean };          // PR24
   };
