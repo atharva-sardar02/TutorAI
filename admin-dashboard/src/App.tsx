@@ -68,10 +68,7 @@ import { ExperimentList } from './pages/Experiments/ExperimentList';
 import { KillSwitches } from './pages/System/KillSwitches';
 import { AuditLog } from './pages/System/AuditLog';
 import { SystemHealth } from './pages/System/SystemHealth';
-
-function UserManagementPage() {
-  return <div style={{ padding: '20px' }}><h2>User Management</h2><p>Coming soon</p></div>;
-}
+import { UserManagement } from './pages/System/UserManagement';
 
 function App() {
   return (
@@ -230,7 +227,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MainLayout>
-                      <UserManagementPage />
+                      <UserManagement />
                     </MainLayout>
                   </ProtectedRoute>
                 }

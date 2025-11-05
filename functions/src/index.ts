@@ -944,3 +944,6 @@ export { exportUserDataEndpoint, deleteUserAccountEndpoint } from './compliance/
 // Admin Dashboard Setup (ONE-TIME USE - REMOVE AFTER SETUP)
 export { setupAdminUser } from './admin/setupAdmin';
 
+// Admin Dashboard User Management (PR-ADMIN-06)
+export { getUserProfile } from './admin/userProfileApi';
+
