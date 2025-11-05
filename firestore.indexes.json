@@ -465,6 +465,14 @@
         { "fieldPath": "anomalyScore", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "k_factor_metrics",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "loopType", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
