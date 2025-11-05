@@ -5,8 +5,8 @@ import { MetricCard } from '@/components/Cards/MetricCard';
 import { StatCard } from '@/components/Cards/StatCard';
 import { LoadingState } from '@/components/Common/LoadingState';
 import { ErrorState } from '@/components/Common/ErrorState';
-import { getDashboardStats, subscribeToRecentActivity, ActivityLogEntry } from '@/services/firestoreService';
-import type { DashboardStats } from '@/services/firestoreService';
+import { getDashboardStats, subscribeToRecentActivity } from '@/services/firestoreService';
+import type { DashboardStats, ActivityLogEntry } from '@/services/firestoreService';
 import { formatDistanceToNow } from 'date-fns';
 
 export function Dashboard() {
