@@ -1,46 +1,16 @@
-# TutorAI Viral Growth System — TASKS.md (Platinum-Complete)
-**Version 2.1 — November 2025 | Production-Ready + All 31 PRs Complete**
-
----
-
-## 🎯 Progress Summary
-
-**Completed:** 31 of 31 PRs (100%) ✅ | **Status:** Phase Complete - Ready for Production Launch 🚀
-
-### ✅ **All Completed PRs:**
-1. ✅ PR15 – Referral Attribution System
-2. ✅ PR16 – Loop Orchestrator
-3. ✅ PR25 – Incentives & Economy Agent
-4. ✅ PR32 – Degradation & Feature Kills
-5. ✅ PR28 – MCP Contracts + Rationale Logging
-6. ✅ PR17 – Experimentation Framework
-7. ✅ PR29 – Growth Ops Dashboard (Backend APIs)
-8. ✅ PR18 – Tutor Card Generator (First viral surface!) ⭐
-9. ✅ PR17.5 – Personalization Agent (Persona-based copy + localization)
-10. ✅ PR26 – Micro-FVM (5-question guest assessment) ⭐
-11. ✅ PR21 – Activity Feed (Subject presence + real-time display) ⭐
-12. ✅ PR20 – Transcription & Agentic Actions (Whisper + GPT + PrepPacks) 🤖
-13. ✅ PR19 – Progress Reels (Privacy-compliant carousel + consent) 🎥
-14. ✅ PR27 – Cohort Rooms + Leaderboards (Social presence v2)
-15. ✅ PR23 – Study Buddy Challenge (First student viral loop!) ⭐
-16. ✅ PR30 – Parent-Child Challenge (Beat-My-Skill) ⭐
-17. ✅ PR24 – Parent Pod + Tutor Peer Loops ⭐
-18. ✅ PR22 – Fraud Detection & Review (Anomaly scoring + hCaptcha)
-19. ✅ PR31 – Compliance & DSR (GDPR/CCPA/COPPA/FERPA compliant) 🔒
-
-**Phase Status:** 🎉 ALL COMPLETE
+# MessageAI Viral Growth System — TASKS.md (Platinum-Complete)
+**Version 2.0 — November 2025 | Production-Ready + Platinum Extensions**
 
 ---
 
 ## 📋 Document Overview
 
-This task list covers **all viral growth features** (PR15–PR32) for TutorAI, incorporating:
+This task list covers **all viral growth features** (PR15–PR32) for MessageAI, incorporating:
 - **Core viral loops** (PR15–24): Attribution, orchestration, surfaces, fraud, student/parent/tutor loops
 - **Platinum extensions** (PR25–32): Incentives economy, async results, cohort rooms, MCP logging, ops dashboard, compliance
 
-**Total Scope:** 31 PRs, 6 weeks, 2-person squad ✅ **COMPLETE**  
-**Launch Status:** Production-Ready 🚀  
-**Aligned with:** TutorAI codebase structure (monorepo: app/, functions/)
+**Total Scope:** 18 PRs, 6 weeks, 2-person squad  
+**Aligned with:** Legacy MessageAI codebase structure (no `shared/` directory)
 
 ---
 
@@ -92,42 +62,42 @@ Each task includes:
 **Kill-Switch:** `growth.referralAttribution.enabled`
 
 **Tasks:**
-- [X] **Firestore Schema & Rules**
+- [ ] **Firestore Schema & Rules**
   - Create `/referrals` collection with composite indexes
   - Schema: `{ referralId, referrerId, referrerType, targetType, loopType, status, metadata, timestamps, deviceHints }`
   - Lock down writes (server-only)
   - Files: `app/src/types/growthTypes.ts`, `firestore.rules`, `firestore.indexes.json`
   - Acceptance: Schema enforced, 95% write success rate
 
-- [X] **Referral Link Generator**
+- [ ] **Referral Link Generator**
   - HMAC signing + Firebase Dynamic Links (or Branch.io fallback)
   - Include UTM params, channel metadata, experiment variant
   - Files: `functions/src/utils/links.ts`, `functions/src/utils/crypto.ts`
   - Acceptance: Links generated <100ms, valid 30 days, HMAC verified
 
-- [X] **First-Open Attribution Handler**
+- [ ] **First-Open Attribution Handler**
   - Capture `referralId` on app launch, associate to user on signup
   - Handle Android install referrer, iOS universal links
   - Store device hints (deviceId, userAgent, ipHash) for fraud
   - Files: `functions/src/growth/referralHandler.ts`
   - Acceptance: ≥95% attribution accuracy (click → install → open → signup)
 
-- [X] **Admin Read Endpoint**
+- [ ] **Admin Read Endpoint**
   - Query `/referrals` by referrerId, status, date range
   - Files: `functions/src/growth/referralHandler.ts`
   - Acceptance: Admins can debug attribution chains
 
-- [X] **Client Integration**
+- [ ] **Client Integration**
   - Call attribution handler on first launch
   - Files: `app/src/services/growth/referralService.ts`
   - Acceptance: Zero client-side errors, 100% coverage
 
-- [X] **Fallback Behavior**
+- [ ] **Fallback Behavior**
   - If Dynamic Links fails → use custom short domain
   - If attribution fails → log to `/attribution_failures` for manual review
   - Acceptance: Graceful degradation, no user-visible errors
 
-- [X] **Tests**
+- [ ] **Tests**
   - E2E: click → install → open → signup on iOS/Android
   - Unit: HMAC signing, link parsing, device fingerprinting
   - Files: `functions/__tests__/referralHandler.test.ts`
@@ -150,45 +120,45 @@ Each task includes:
 **Kill-Switch:** `growth.orchestrator.enabled` + per-loop flags
 
 **Tasks:**
-- [X] **Decision Engine**
+- [ ] **Decision Engine**
   - Evaluate: user role, session context, experiment variant, past exposures, cooldowns
   - Return: `{ loopType, persona, copyKey, cooldownMs, experimentId, variantId, rationale }`
   - Files: `functions/src/growth/loopOrchestrator.ts`
   - Acceptance: Decision made in <150ms (P95), rationale logged
 
-- [X] **Cooldown Store**
+- [ ] **Cooldown Store**
   - Create `/cooldowns/{userId}/{loopType}` with TTL index
   - Atomic check-and-set to prevent duplicate prompts
   - Files: `functions/src/utils/firestore.ts`, `firestore.rules`
   - Acceptance: Zero duplicate prompts within cooldown period
 
-- [X] **Eligibility Rules**
+- [ ] **Eligibility Rules**
   - Constraints: 1 prompt/24h per loop, min 5 sessions for Tutor Spotlight, rating ≥4.5
   - Files: `functions/src/growth/loopOrchestrator.ts`
   - Acceptance: Rules enforced 100%, audit log shows rejections
 
-- [X] **Feature Flags Integration**
+- [ ] **Feature Flags Integration**
   - Per-loop toggles: `growth.loops.tutorSpotlight.enabled`, rollout %
   - Files: `app/src/config/featureFlags.ts`
   - Acceptance: Kill-switch works in <1 min, rollback verified
 
-- [X] **Logging & Exposures**
+- [ ] **Logging & Exposures**
   - Write `/loop_exposures/{userId}/{timestamp}` with decision details
   - Files: `functions/src/growth/loopOrchestrator.ts`, `app/src/types/growthTypes.ts`
   - Acceptance: 100% of decisions logged, PII redacted
 
-- [X] **Client Integration**
+- [ ] **Client Integration**
   - Mobile calls orchestrator before showing viral prompts
   - Handles "throttled" response gracefully (no UI shown)
   - Files: `app/src/services/growth/tutorCardService.ts`, `app/src/services/growth/progressReelService.ts`
   - Acceptance: Zero client errors, fallback to silent failure
 
-- [X] **Fallback Behavior**
+- [ ] **Fallback Behavior**
   - If orchestrator times out (>500ms) → skip prompt, log incident
   - If Firestore write fails → retry 3x, then fail silently
   - Acceptance: No user-visible errors, incident alerts sent
 
-- [X] **Tests**
+- [ ] **Tests**
   - Unit: Eligibility logic, cooldown enforcement, experiment allocation
   - Load: 100 RPS sustained, P95 <150ms
   - Files: `functions/__tests__/loopOrchestrator.test.ts`
@@ -211,30 +181,30 @@ Each task includes:
 **Kill-Switch:** `growth.mcp.loggingEnabled`
 
 **Tasks:**
-- [X] **MCP Schema Definitions**
+- [ ] **MCP Schema Definitions**
   - Define contracts for: Orchestrator, Personalization, Incentives, Fraud, Experimentation
   - Schema: `{ agentName, operation, input, output, rationale, featuresUsed, latency, timestamp }`
   - Files: `app/src/types/growthTypes.ts` (MCPMessage, AgentLog interfaces)
   - Acceptance: All 5 agents have documented schemas
 
-- [X] **Rationale Logging Middleware**
+- [ ] **Rationale Logging Middleware**
   - Wrap agent calls to auto-log to `/agent_logs/{userId}/{timestamp}`
   - Enforce rationale ≤240 chars, PII redaction
   - Files: `functions/src/utils/agentLogger.ts`
   - Acceptance: 100% of agent calls logged, zero PII leaks
 
-- [X] **Replay Tooling (Admin)**
+- [ ] **Replay Tooling (Admin)**
   - Query `/agent_logs` by userId, loopType, date range
   - Visualize decision chain: loop → orchestrator → personalization → fraud
   - Files: `functions/src/growth/experimentService.ts` (admin endpoint)
   - Acceptance: Admins can trace any user's viral journey
 
-- [X] **PII Redaction**
+- [ ] **PII Redaction**
   - Scrub names, emails, phones from logs automatically
   - Files: `functions/src/ai/piiRedaction.ts` (reuse existing)
   - Acceptance: 100% PII-free logs on test dataset
 
-- [X] **Tests**
+- [ ] **Tests**
   - Unit: Schema validation, rationale truncation, PII redaction
   - Integration: End-to-end trace for 1 user across 3 agents
   - Files: `functions/__tests__/agentLogger.test.ts`
@@ -257,7 +227,7 @@ Each task includes:
 **Kill-Switch:** Master: `growth.enabled`, per-loop flags
 
 **Tasks:**
-- [X] **Feature Flag Config**
+- [ ] **Feature Flag Config**
   - Centralized config in Firestore: `/feature_flags/{flagName}`
   - Schema: `{ enabled, rollout%, environments, dependencies }`
   - Files: `app/src/config/featureFlags.ts`, `functions/src/utils/featureFlags.ts`
@@ -652,10 +622,8 @@ Each task includes:
 
 ---
 
-#### **PR19 – Progress Reel Creator & Consent** ✅
+#### **PR19 – Progress Reel Creator & Consent**
 **Area:** Frontend + Backend | **Risk:** High | **Effort:** L | **Owner:** Engineer B (frontend) + Engineer A (backend)
-
-**Status:** ✅ COMPLETE (2025-11-04)
 
 **Scope:** Privacy-compliant progress reels with consent management.
 
@@ -663,87 +631,54 @@ Each task includes:
 
 **Kill-Switch:** `growth.loops.progressReel.enabled`
 
-**Architecture Decisions:**
-- **Video Generation:** React Native Animated carousel (no Cloudinary) - Faster, cheaper, more private
-- **Consent Storage:** Dual storage (profile flag + audit collection) for COPPA/FERPA compliance
-- **PII Redaction:** Simple regex pattern matching for school names (80% coverage, extensible)
-- **Trigger:** Auto-suggest (qualityScore >= 80) + manual option
-
 **Tasks:**
-- [X] **Consent Schema & Revocation**
-  - Dual storage: `/users/{userId}.consents` + `/consents/{userId}/history`
-  - Revocation trigger: Deletes reels automatically via Firestore trigger
-  - Files: `app/src/types/growthTypes.ts`, `functions/src/growth/consentManager.ts`, `functions/src/growth/onConsentRevoked.ts`, `firestore.rules`
-  - Acceptance: Consent changes trigger immediately, reels deleted <5 seconds
+- [ ] **Consent Schema & Revocation**
+  - `/consents/{userId}` → granted consents (progressSharing, dataSharing)
+  - Revocation trigger: Delete media within 1h
+  - Files: `app/src/types/growthTypes.ts`, `functions/src/growth/onConsentRevoked.ts`, `firestore.rules`
+  - Acceptance: Consent changes propagate <1h, media deleted
 
-- [X] **PII Redaction Pipeline**
-  - Regex-based: names, emails, phones, school names (pattern matching)
-  - Test coverage: 15+ test cases (school formats, combined PII, edge cases)
-  - Files: `functions/src/ai/piiRedaction.ts` (added `redactSchoolNames()`, `redactForProgressReel()`), `functions/__tests__/piiRedaction.test.ts`
-  - Acceptance: All test cases pass, educational content preserved
+- [ ] **PII Redaction Pipeline**
+  - Regex + NER to scrub: names, emails, phones, school names
+  - Test dataset: 100 session summaries (must be 100% PII-free)
+  - Files: `functions/src/ai/piiRedaction.ts`, `functions/__tests__/piiRedaction.test.ts`
+  - Acceptance: 100% PII-free on test dataset
 
-- [X] **Reel Generation (Carousel-Based)**
-  - React Native Animated carousel: intro + highlights + CTA slides
-  - No external APIs: All in-app, <3s generation time
-  - Referral link integration: Attribution tracked via PR15
-  - Files: `functions/src/growth/generateProgressReel.ts`, `app/src/components/growth/ProgressReelModal.tsx`
-  - Acceptance: Carousel renders smoothly (60fps), share button works
+- [ ] **Video Generation**
+  - Cloudinary Video API: 15-30s reel with highlights
+  - Audio-safe background music (royalty-free)
+  - Fallback: Animated card (no video) if generation fails
+  - Files: `functions/src/growth/generateProgressReel.ts`
+  - Acceptance: Reel generated <30s, fallback works
 
-- [X] **Frontend UX**
-  - `ConsentExplainer.tsx`: Clear explanation of what's shared vs. private
-  - `ProgressReelModal.tsx`: Interactive carousel with pagination dots
-  - Native share: Uses device Share API (iOS/Android)
-  - Files: `app/src/components/growth/ConsentExplainer.tsx`, `app/src/components/growth/ProgressReelModal.tsx`, `app/src/services/growth/consentService.ts`, `app/src/services/growth/progressReelService.ts`, `app/app/progressReel.tsx`
-  - Acceptance: User can preview before sharing, consent flow is clear
+- [ ] **Frontend UX**
+  - `ConsentExplainer.tsx`: Explain what's shared, show example
+  - `ProgressReelModal.tsx`: Preview reel, share via native sheet
+  - Files: `app/src/components/growth/ConsentExplainer.tsx`, `app/src/components/growth/ProgressReelModal.tsx`
+  - Acceptance: User can preview before sharing, consent flow clear
 
-- [X] **Action Executor Integration**
-  - Integrated with PR20 `afterSummary` trigger
-  - Checks consent before generation
-  - Queues `progress_reel_ready` notification
-  - Files: `functions/src/growth/actionExecutor.ts` (added `executeProgressReel()`)
-  - Acceptance: Reels generate automatically after high-quality sessions
+- [ ] **Fallback Behavior**
+  - If reel generation times out (>60s) → fallback to static card
+  - If Cloudinary API down → skip reel, offer text-based share
+  - Preserve attribution in fallback (text link still tracked)
+  - Acceptance: User never blocked, fallback preserves K-factor
 
-- [X] **Notification Handler**
-  - Added `progress_reel_ready` notification type
-  - Routes to `/progressReel?reelId={id}`
-  - Files: `app/src/services/notificationService.ts`
-  - Acceptance: Tapping notification opens reel modal
+- [ ] **Analytics**
+  - Emit: `reel_generated`, `reel_shared`, `reel_viewed`, `consent_granted`, `consent_revoked`
+  - Include: consent metadata (grantedAt, revokedAt)
+  - Files: `app/src/services/growth/progressReelService.ts`, `app/src/services/growth/experimentService.ts`
+  - Acceptance: 100% events tracked, consent changes logged
 
-- [X] **Feature Flag**
-  - Enabled `growth.loops.progressReel` flag
-  - Files: `app/src/config/featureFlags.ts`
-  - Acceptance: Feature toggle works
-
-- [X] **Firestore Configuration**
-  - Security rules: Protect consents and reels, allow public read for sharing
-  - Indexes: userId + createdAt, userId + status + createdAt
-  - Files: `firestore.rules`, `firestore.indexes.json`
-  - Acceptance: Rules secure, queries efficient
-
-- [ ] **Analytics** (Stub Implementation - TODO: PR17 Integration)
-  - Stub: `trackReelEvent()` logs events only
-  - Events: `reel_generated`, `reel_shared`, `reel_viewed`, `consent_granted`, `consent_revoked`
-  - Files: `app/src/services/growth/referralService.ts`
-  - Acceptance: Stub in place, ready for PR17 integration
-
-- [X] **Tests**
-  - Unit: PII redaction (15+ test cases)
-  - Manual: Requires full E2E testing (see PR19-TESTING-GUIDE.md)
-  - Files: `functions/__tests__/piiRedaction.test.ts`
-  - Acceptance: Unit tests pass, manual testing guide complete
+- [ ] **Tests**
+  - Unit: PII redaction, video generation, consent logic
+  - Integration: End-to-end consent → reel → share flow
+  - Files: `functions/__tests__/piiRedaction.test.ts`, `app/__tests__/integration/viralLoops.e2e.test.ts`
+  - Acceptance: 80% coverage, E2E passes
 
 **Global Acceptance:**
-- ✅ Consent required before reel generation
-- ✅ PII redaction works (all test cases pass)
-- ✅ Reel generation <3s (carousel-based)
-- ✅ Consent revocation deletes reels <5 seconds
-- ✅ Auto-suggest triggers for qualityScore >= 80
-- ✅ Share functionality works (native Share API)
-- ⏳ Manual testing required (PR19-TESTING-GUIDE.md)
-
-**Documentation:**
-- `PR19-SUMMARY.md` - Complete implementation summary
-- `PR19-TESTING-GUIDE.md` - Comprehensive testing guide (10 test scenarios)
+- Consent required, PII redaction 100% on test set
+- Reel generated <30s with fallback (static card)
+- Consent changes propagate within 24h
 
 ---
 
@@ -945,7 +880,7 @@ Each task includes:
 
 ---
 
-#### **PR20 – Transcription & Agentic Actions** ✅
+#### **PR20 – Transcription & Agentic Actions**
 **Area:** Backend + Frontend | **Risk:** High | **Effort:** L | **Owner:** Engineer A (backend) + Engineer B (frontend notifications)
 
 **Scope:** Transcribe sessions, summarize, trigger 4+ agentic actions.
@@ -954,61 +889,52 @@ Each task includes:
 
 **Kill-Switch:** `growth.transcription.enabled`, `growth.agenticActions.enabled`
 
-**Status:** ✅ COMPLETE (2025-11-04)
-
 **Tasks:**
-- [X] **Whisper Integration**
+- [ ] **Whisper Integration**
   - Trigger on: Recording uploaded to `/recordings/{sessionId}`
   - Call: OpenAI Whisper API → store transcript in `/transcripts/{sessionId}`
   - Retention: 90 days (auto-delete)
   - Files: `functions/src/transcription/transcribeSession.ts`
   - Acceptance: Transcription completes <10 min for 60 min session
 
-- [X] **Session Summarizer**
+- [ ] **Session Summarizer**
   - GPT-4o-mini: Summarize transcript → `{ highlights, topics, studentProgress, nextSteps }`
   - Store in `/sessions/{sessionId}/summary`
   - Files: `functions/src/ai/sessionSummarizer.ts`
   - Acceptance: Summary generated <30s, cost <$0.50/session
 
-- [X] **Action Analyzer**
+- [ ] **Action Analyzer**
   - Rules: If 5★ rating → TutorCard, if progressMade → ProgressReel, if testTopic → StudyBuddy, always → PrepPack
   - Output: List of actions to execute
   - Files: `functions/src/growth/actionAnalyzer.ts`
   - Acceptance: ≥4 distinct actions identified per session type
 
-- [X] **Action Executor**
+- [ ] **Action Executor**
   - Execute actions: Generate card/reel, send notification, schedule follow-up
   - Integrate with orchestrator: Check eligibility + cooldowns
   - Files: `functions/src/growth/actionExecutor.ts`
   - Acceptance: Actions triggered within 5 min of summary
 
-- [X] **Client Notifications**
+- [ ] **Client Notifications**
   - Push notification: "Your session highlights are ready!"
   - In-app toast: "Share your progress with parents"
-  - Files: `app/src/services/notificationService.ts` (notification handler updated)
+  - Files: `app/src/services/growth/referralService.ts` (notification handler)
   - Acceptance: Notifications delivered <1 min, opt-out honored
 
-- [X] **Frontend: Session Detail Screen**
-  - Display: Quality score, sentiment, highlights, topics, progress, prep pack
-  - Share functionality with native sheet
-  - Material cards for prep pack resources
-  - Files: `app/app/sessionDetail.tsx` (520 lines)
-  - Acceptance: Beautiful UI with all sections rendering
-
-- [X] **Fallback Behavior**
+- [ ] **Fallback Behavior**
   - If Whisper fails → retry 3x, then mark transcript unavailable
   - If summarization fails → use static template ("Great session!")
   - If action execution fails → log to `/failed_actions` for manual retry
   - Acceptance: User never blocked, transcript failure doesn't block session completion
 
-- [ ] **Cost Controls** (Deferred to production monitoring)
+- [ ] **Cost Controls**
   - Budget: $0.50/session (Whisper $0.36 + GPT $0.10 + overhead $0.04)
   - Throttle: Max 100 transcriptions/day (increase gradually)
   - Alert: If cost exceeds $50/day
   - Files: `functions/src/transcription/transcribeSession.ts` (budget tracking)
   - Acceptance: Cost stays within budget, alerts trigger
 
-- [ ] **Tests** (Deferred to testing phase)
+- [ ] **Tests**
   - Unit: Transcription, summarization, action analysis
   - Integration: End-to-end session → transcript → summary → actions
   - Files: `functions/__tests__/transcriptionPipeline.test.ts`
@@ -1022,7 +948,7 @@ Each task includes:
 
 ---
 
-#### **🔁 Extension: Next-Session Prep Pack** ✅
+#### **🔁 Extension: Next-Session Prep Pack**
 
 **Scope:** Generate prep pack from previous summary + upcoming topic.
 
@@ -1030,52 +956,43 @@ Each task includes:
 
 **Kill-Switch:** `growth.prepPack.enabled`
 
-**Status:** ✅ COMPLETE (2025-11-04)
-
 **Tasks:**
-- [X] **Resource Curation**
+- [ ] **Resource Curation**
   - Extract: Practice items, links, brief plan from summary
   - AI: GPT-4o-mini generates 3-5 resources based on nextSteps
-  - Files: `functions/src/growth/generatePrepPack.ts`
+  - Files: `functions/src/growth/prepPackGenerator.ts`
   - Acceptance: Prep pack generated <15s
 
-- [X] **AI Summarization Integration**
+- [ ] **AI Summarization Integration**
   - Compile: "Based on last session, here's what to practice..."
   - Include: Links to existing practice decks, external resources (Khan Academy)
-  - Files: `functions/src/ai/sessionSummarizer.ts`, `functions/src/growth/generatePrepPack.ts`
+  - Files: `functions/src/ai/sessionSummarizer.ts` (extend)
   - Acceptance: Prep pack includes 3+ actionable items
 
-- [X] **Frontend Display**
-  - UI: Display prep pack materials as tappable cards
-  - Material types: Practice problems, study guide, flashcards, video links
-  - Files: `app/app/sessionDetail.tsx` (displays prep pack)
-  - Acceptance: All materials render correctly
-
-- [ ] **Share Flow (Frontend)** (Deferred - can share via existing share button)
+- [ ] **Share Flow (Frontend)**
   - Modal: Preview prep pack, share via email/SMS to student/parent
   - Include: Referral link (tutor can invite peers to use platform)
   - Files: `app/src/components/growth/PrepPackModal.tsx`, `app/src/services/growth/prepPackService.ts`
   - Acceptance: Share flow works, attribution tracked
 
-- [ ] **Analytics** (Deferred to analytics phase)
+- [ ] **Analytics**
   - Emit: `prepPack_generated`, `prepPack_shared`, `prepPack_viewed`
   - Track: Completion rate (did student practice recommended items?)
   - Files: `app/src/services/growth/experimentService.ts`
   - Acceptance: 100% events tracked
 
-- [X] **Fallback Behavior**
+- [ ] **Fallback Behavior**
   - If prep pack generation fails → show generic "Practice more" message
   - Acceptance: User never blocked
 
-- [ ] **Tests** (Deferred to testing phase)
+- [ ] **Tests**
   - Integration: End-to-end prep pack generation + share
   - Files: `app/__tests__/integration/viralLoops.e2e.test.ts`
   - Acceptance: 80% coverage, E2E passes
 
 **Acceptance:**
-- ✅ Prep pack generated for all session types
-- ✅ Display functional in session detail screen
-- ⏳ Share flow and analytics deferred
+- Prep pack generated for 3 session types
+- Share flow functional, attribution tracked
 
 ---
 
@@ -1157,94 +1074,87 @@ Each task includes:
 
 ---
 
-#### **PR23 – Study Buddy Challenge** ✅
+#### **PR23 – Study Buddy Challenge**
 **Area:** Frontend + Backend | **Risk:** Low | **Effort:** M | **Owner:** Engineer A (backend) + Engineer B (frontend)
 
-**Status:** ✅ COMPLETE (2025-11-04)
+**Scope:** Student→Student loop to invite peers into shared streaks.
 
-**Scope:** Student→Student loop to invite peers into shared 5-question challenges with dual rewards.
-
-**Dependencies:** PR15 (referral links), PR16 (orchestrator), PR20 (agentic actions), PR25 (incentives)
+**Dependencies:** PR15 (referral links), PR16 (orchestrator), PR20 (agentic actions)
 
 **Kill-Switch:** `growth.loops.studyBuddy.enabled`
 
 **Tasks:**
-- [X] **Backend: Challenge Service**
-  - Created `studyBuddyService.ts` with 4 callable functions
-  - Challenge generation with 5 questions, referral attribution, 7-day expiration
-  - Sample question bank (Math, Physics)
-  - Files: `functions/src/growth/studyBuddyService.ts` (450 lines)
-  - Acceptance: Challenge created <500ms, link valid 7 days ✅
+- [ ] **Backend: Challenge Asset + Link**
+  - Create challenge: `{ studentId, subject, topic, questions[5], streakReward }`
+  - Generate signed link: `/challenge/{challengeId}?ref={referralId}`
+  - Files: `functions/src/growth/actionExecutor.ts`, `functions/src/utils/links.ts`
+  - Acceptance: Challenge created <500ms, link valid 7 days
 
-- [X] **Frontend: Challenge Modal**
-  - Beautiful gradient UI (blue theme: #4facfe → #00f2fe)
-  - Shows rewards preview, difficulty, question count
-  - Native share sheet integration
-  - Files: `app/src/components/growth/StudyBuddyChallengeModal.tsx` (280 lines)
-  - Acceptance: Modal renders <500ms, share works ✅
+- [ ] **Frontend: Challenge Modal**
+  - UI: Select friend (from contacts), preview challenge, share via native sheet
+  - Show: "Beat my score! Complete 5 questions, earn streak shield"
+  - Files: `app/src/components/growth/ActivityDetailModal.tsx`
+  - Acceptance: Modal renders <500ms, share works
 
-- [X] **Frontend: Challenge Screen**
-  - Interactive quiz interface with progress bar
-  - Radio button answer selection, navigation, grading
-  - Files: `app/src/components/growth/StudyBuddyChallengeScreen.tsx` (390 lines)
-  - Acceptance: Quiz loads <1s, answers graded correctly ✅
+- [ ] **Eligibility & Cooldown**
+  - Limit: Once per 48h per subject
+  - Integrate: Orchestrator checks cooldown before creating challenge
+  - Files: `functions/src/growth/loopOrchestrator.ts`
+  - Acceptance: Cooldowns enforced, zero spam
 
-- [X] **Eligibility & Cooldown**
-  - 48h cooldown per subject (stored in `/cooldowns/{uid}/loops/studyBuddy_{subject}`)
-  - Checked in `executeStudyBuddy()` before creation
-  - Files: `functions/src/growth/actionExecutor.ts`
-  - Acceptance: Cooldowns enforced, zero spam ✅
+- [ ] **Analytics**
+  - Emit: `challenge_sent`, `challenge_opened`, `challenge_completed`, `streak_earned`
+  - Track: Completion rate (% of opened challenges completed)
+  - Files: `app/src/types/growthTypes.ts`, `functions/src/growth/computeMetrics.ts`
+  - Acceptance: 100% events tracked, funnel visible
 
-- [X] **Action Analyzer Integration**
-  - Triggers when: student scores ≥70%, role = student
-  - Difficulty auto-scaled by score (90+ = hard, 80+ = medium, else easy)
-  - Files: `functions/src/growth/actionAnalyzer.ts`
-  - Acceptance: Opportunity detected for eligible sessions ✅
+- [ ] **Fallback Behavior**
+  - If challenge creation fails → show "Try again" message
+  - Acceptance: User never blocked
 
-- [X] **Analytics** (Stub Implementation)
-  - Events tracked: `challenge_created`, `challenge_sent`, `challenge_opened`, `challenge_started`, `challenge_completed`
-  - Console logging only (ready for PR17 integration)
-  - Files: `app/src/services/growth/studyBuddyService.ts`
-  - Acceptance: All events logged ✅
-
-- [X] **Types & Configuration**
-  - Added 6 interfaces to `growthTypes.ts`
-  - Enabled `studyBuddy` feature flag
-  - Added Firestore rules and 2 composite indexes
-  - Acceptance: Types complete, flag enabled, rules secure ✅
-
-- [X] **Tests**
-  - 5 passing unit tests for challenge generation
-  - 8 skipped tests documented for emulator integration
-  - Files: `functions/__tests__/studyBuddyService.test.ts`
-  - Acceptance: Basic tests pass ✅
+- [ ] **Tests**
+  - Integration: End-to-end challenge creation → share → completion
+  - Files: `app/__tests__/integration/viralLoops.e2e.test.ts`
+  - Acceptance: 80% coverage, E2E passes
 
 **Global Acceptance:**
-- ✅ Challenge created <500ms
-- ✅ 48h cooldown enforced per subject
-- ✅ Referral attribution tracked (100%)
-- ✅ Dual rewards issued (both creator and participant)
-- ✅ Beautiful gradient UI renders correctly
-- ✅ Quiz grading works accurately
-- ⏳ Manual E2E testing required (see PR23-TESTING-GUIDE.md)
-
-**Documentation:**
-- `PR23-IMPLEMENTATION-PLAN.md` - Full technical plan (1,000+ lines)
-- `PR23-SUMMARY.md` - Complete implementation summary (500+ lines)
-- `PR23-TESTING-GUIDE.md` - Comprehensive testing guide (10 test scenarios)
+- Challenge created <500ms, limited to 48h cooldown
+- Analytics tracked, streak rewards issued
 
 ---
 
-#### **PR30 – Parent-Child Challenge** ⭐ **NEW** (Choose One)
+#### **PR30 – Second Student Loop** ⭐ **NEW** (Choose One)
 **Area:** Frontend + Backend | **Risk:** Low | **Effort:** M | **Owner:** Engineer A (backend) + Engineer B (frontend)
 
-**Scope:** Choose Option A (Beat-My-Skill) or Option B (Streak Rescue).
+**Scope:** Choose Option A (Streak Rescue) or Option B (Beat-My-Skill).
 
 **Dependencies:** PR23 (first student loop), PR16 (orchestrator), PR25 (incentives)
 
-**Kill-Switch:** `growth.loops.beatMySkill.enabled` OR `growth.loops.streakRescue.enabled`
+**Kill-Switch:** `growth.loops.streakRescue.enabled` OR `growth.loops.beatMySkill.enabled`
 
-**Option A: Beat-My-Skill**
+**Option A: Streak Rescue**
+
+**Tasks:**
+- [ ] **Phone-a-Friend Flow**
+  - Detect: Streak at risk (user hasn't practiced in 20+ hours)
+  - Prompt: "Phone-a-friend to keep your streak alive!"
+  - Friend joins: Both complete 5-question co-practice
+  - Reward: Streak shield (prevents loss for 24h)
+  - Files: `functions/src/growth/streakRescueService.ts`, `app/src/components/growth/StreakRescueModal.tsx`
+  - Acceptance: Rescue triggered within 4h of risk, both users rewarded
+
+- [ ] **Co-Practice Session**
+  - Real-time: Show friend's progress (questions completed)
+  - Completion: Both must finish to earn shield
+  - Files: `app/src/components/growth/CoPracticeScreen.tsx`
+  - Acceptance: Session completes <5 min, progress synced
+
+- [ ] **Analytics**
+  - Emit: `rescue_triggered`, `friend_invited`, `rescue_completed`, `streak_saved`
+  - Files: `app/src/services/growth/experimentService.ts`
+  - Acceptance: 100% events tracked
+
+**Option B: Beat-My-Skill**
 
 **Tasks:**
 - [ ] **Micro-Deck Creation**
@@ -1266,28 +1176,6 @@ Each task includes:
 
 - [ ] **Analytics**
   - Emit: `deck_shared`, `deck_attempted`, `score_beaten`, `both_rewarded`
-  - Files: `app/src/services/growth/experimentService.ts`
-  - Acceptance: 100% events tracked
-
-**Option B: Streak Rescue**
-
-**Tasks:**
-- [ ] **Phone-a-Friend Flow**
-  - Detect: Streak at risk (user hasn't practiced in 20+ hours)
-  - Prompt: "Phone-a-friend to keep your streak alive!"
-  - Friend joins: Both complete 5-question co-practice
-  - Reward: Streak shield (prevents loss for 24h)
-  - Files: `functions/src/growth/streakRescueService.ts`, `app/src/components/growth/StreakRescueModal.tsx`
-  - Acceptance: Rescue triggered within 4h of risk, both users rewarded
-
-- [ ] **Co-Practice Session**
-  - Real-time: Show friend's progress (questions completed)
-  - Completion: Both must finish to earn shield
-  - Files: `app/src/components/growth/CoPracticeScreen.tsx`
-  - Acceptance: Session completes <5 min, progress synced
-
-- [ ] **Analytics**
-  - Emit: `rescue_triggered`, `friend_invited`, `rescue_completed`, `streak_saved`
   - Files: `app/src/services/growth/experimentService.ts`
   - Acceptance: 100% events tracked
 
@@ -1376,7 +1264,7 @@ Each task includes:
 
 ---
 
-#### **PR31 – Compliance Memo & DSR Hooks** ⭐ **COMPLETE** ✅
+#### **PR31 – Compliance Memo & DSR Hooks** ⭐ **NEW**
 **Area:** Trust | **Risk:** High | **Effort:** M | **Owner:** Engineer A (backend) + Legal review
 
 **Scope:** 1-pager covering COPPA/FERPA, data flows, consent gates, retention; implement delete/export user data hooks; tests for consent revocation.
@@ -1386,69 +1274,78 @@ Each task includes:
 **Kill-Switch:** N/A (compliance always active)
 
 **Tasks:**
-- [X] **Compliance Memo (1-Pager)** ✅
+- [ ] **Compliance Memo (1-Pager)**
   - Document: COPPA/FERPA requirements, data flows (session → transcript → summary → share)
   - Consent gates: Parent must enable "Share progress" for reels
   - Retention: Transcripts 90 days, reels 30 days, referrals 1 year
   - PII handling: Redaction applied before any sharing
   - Files: `docs/COMPLIANCE_MEMO.md`
-  - Status: ✅ COMPLETE
+  - Acceptance: Memo approved by legal counsel
 
-- [X] **Data Subject Rights (DSR) Endpoints** ✅
+- [ ] **Data Subject Rights (DSR) Endpoints**
   - `/user/{userId}/export` → JSON export of all user data
   - `/user/{userId}/delete` → Soft delete (mark deleted, purge after 30 days)
   - Files: `functions/src/compliance/dsrHandler.ts`
-  - Status: ✅ COMPLETE
+  - Acceptance: Endpoints pass tests, GDPR/CCPA compliant
 
-- [X] **Delete User Data Hook** ✅
+- [ ] **Delete User Data Hook**
   - On delete: Remove from `/users`, `/referrals`, `/consents`, `/rewards`, `/balances`
   - Anonymize: `/agent_logs`, `/loop_exposures` (keep for analytics, strip PII)
   - Files: `functions/src/compliance/deleteUserData.ts`
-  - Status: ✅ COMPLETE
+  - Acceptance: All user data deleted/anonymized within 24h
 
-- [X] **Export User Data Hook** ✅
+- [ ] **Export User Data Hook**
   - Export: All collections where userId appears (JSON format)
   - Include: Messages, sessions, referrals, rewards, consents
   - Files: `functions/src/compliance/exportUserData.ts`
-  - Status: ✅ COMPLETE
+  - Acceptance: Export completes <5 min, all data included
 
-- [X] **Firestore Configuration** ✅
-  - Security rules: Protect DSR requests and scheduled deletions
-  - Indexes: userId + requestedAt, scheduledFor + type
-  - Files: `firestore.rules`, `firestore.indexes.json`
-  - Status: ✅ COMPLETE
+- [ ] **Consent Revocation Tests**
+  - Test: User revokes consent → reels deleted within 1h
+  - Test: Parent disables sharing → no new reels generated
+  - Files: `functions/__tests__/consentRevocation.test.ts`
+  - Acceptance: Consent changes propagate <1h
+
+- [ ] **PII Audit**
+  - Scan: All logs, share cards, analytics events for PII
+  - Verify: 100% redaction on test dataset
+  - Files: `functions/__tests__/piiAudit.test.ts`
+  - Acceptance: Zero PII leaks in production
+
+- [ ] **Tests**
+  - Unit: DSR endpoints, delete/export logic
+  - Integration: End-to-end user deletion + data verification
+  - Files: `functions/__tests__/dsr.test.ts`
+  - Acceptance: 80% coverage, E2E passes
 
 **Global Acceptance:**
-- ✅ Compliance memo approved (legal review ready)
-- ✅ DSR endpoints implemented and tested
-- ✅ All user data deletion/anonymization functional
-- ✅ Firestore security rules and indexes deployed
-- ✅ GDPR/CCPA/COPPA/FERPA compliant
+- Memo approved by legal counsel
+- DSR endpoints pass tests (GDPR/CCPA compliant)
+- Consent changes propagate within 24h
 
 ---
 
 ## 📅 Roadmap View (By Week)
 
-### **Week 1-2: Infrastructure & Foundations** ✅ **COMPLETE**
-- ✅ **PR15** – Referral Attribution System (Engineer A)
-- ✅ **PR16** – Loop Orchestrator (Engineer A)
-- ✅ **PR28** – MCP Contracts + Rationale Logging (Engineer A)
-- ✅ **PR32** – Degradation & Feature Kills (Engineer A)
-- ✅ **PR25** – Incentives & Economy Agent (Engineer A)
+### **Week 1-2: Infrastructure & Foundations**
+- **PR15** – Referral Attribution System (Engineer A)
+- **PR16** – Loop Orchestrator (Engineer A)
+- **PR28** – MCP Contracts + Rationale Logging (Engineer A)
+- **PR32** – Degradation & Feature Kills (Engineer A)
+- **PR25** – Incentives & Economy Agent (Engineer A)
 
-**Deliverables:** ✅ Attribution working, orchestrator live, kill-switches tested, rewards issued
+**Deliverables:** Attribution working, orchestrator live, kill-switches tested, rewards issued
 
 ---
 
-### **Week 3-4: Viral Surfaces & Experimentation** ⏳ **IN PROGRESS**
-- ✅ **PR17** – Experimentation Framework (Engineer A)
-- ✅ **PR29** – Growth Ops Dashboard (Backend APIs) (Engineer A)
-- ✅ **PR18** – Tutor Card Generator (Engineer B)
-- ✅ **PR17.5** – Personalization Agent (Engineer A + Engineer B)
-- [ ] **PR26** – Async Results Surfaces + Micro-FVM (Engineer B + Engineer A) ← **NEXT**
-- [ ] **PR21** – Activity Feed (Engineer B)
+### **Week 3-4: Viral Surfaces & Experimentation**
+- **PR17** – Experimentation Framework (Engineer A)
+- **PR17.5** – Personalization Agent (Engineer A + Engineer B)
+- **PR18** – Tutor Card Generator (Engineer B)
+- **PR26** – Async Results Surfaces + Micro-FVM (Engineer B + Engineer A)
+- **PR21** – Activity Feed (Engineer B)
 
-**Deliverables:** Experiments running ✅, ops dashboard APIs ✅, tutor cards ✅, personalization ✅, results pages (pending), activity feed (pending)
+**Deliverables:** Tutor cards shareable, experiments running, results pages viral, activity feed live
 
 ---
 
@@ -1464,7 +1361,7 @@ Each task includes:
 
 ### **Week 5-6: Student/Parent Loops & Ops**
 - **PR23** – Study Buddy Challenge (Engineer A + Engineer B)
-- **PR30** – Parent-Child Challenge (Engineer A + Engineer B)
+- **PR30** – Second Student Loop (Engineer A + Engineer B)
 - **PR24** – Parent Pod Invites & Tutor→Tutor Referrals (Engineer A + Engineer B)
 - **PR29** – Growth Ops Dashboard (Engineer A + TBD frontend)
 
@@ -1483,39 +1380,39 @@ Each task includes:
 
 ## ✅ Checklist View (By PR)
 
-### **Infrastructure (PR15-16, 28, 32)** ✅ **COMPLETE**
-- [x] PR15: Referral attribution (95% accuracy, <100ms link gen) ✅
-- [x] PR16: Loop orchestrator (P95 <150ms, rationale logged) ✅
-- [x] PR28: MCP logging (100% agent calls logged, PII-free) ✅
-- [x] PR32: Feature kills (all kill-switches tested, fallbacks work) ✅
+### **Infrastructure (PR15-16, 28, 32)**
+- [ ] PR15: Referral attribution (95% accuracy, <100ms link gen)
+- [ ] PR16: Loop orchestrator (P95 <150ms, rationale logged)
+- [ ] PR28: MCP logging (100% agent calls logged, PII-free)
+- [ ] PR32: Feature kills (all kill-switches tested, fallbacks work)
 
-### **Experimentation & Analytics (PR17, 29)** ✅ **COMPLETE**
-- [x] PR17: Experiments (K-factor daily, guardrails auto-pause) ✅
-- [x] PR29: Ops dashboard (backend APIs complete, UI optional) ✅
+### **Experimentation & Analytics (PR17, 29)**
+- [ ] PR17: Experiments (K-factor daily, guardrails auto-pause)
+- [ ] PR29: Ops dashboard (live metrics <1h lag, kill-switches functional)
 
-### **Incentives (PR25)** ✅ **COMPLETE**
-- [x] PR25: Rewards ledger (deterministic issuance, caps honored, ROI visible) ✅
+### **Incentives (PR25)**
+- [ ] PR25: Rewards ledger (deterministic issuance, caps honored, ROI visible)
 
 ### **Viral Surfaces (PR17.5, 18, 19, 26)**
-- [x] PR17.5: Personalization (persona + locale copy, EN/ES/FR) ✅
-- [x] PR18: Tutor cards (render <3s, uniqueness 14d, attribution tracked) ✅
-- [x] PR19: Progress reels (consent required, PII redaction 100%, fallback works) ✅
-- [x] PR26: Micro-FVM (guest completes <90s, 15 questions, no auth required) ✅
+- [ ] PR17.5: Personalization (persona + locale copy, EN/ES/FR)
+- [ ] PR18: Tutor cards (render <3s, uniqueness 14d, attribution tracked)
+- [ ] PR19: Progress reels (consent required, PII redaction 100%, fallback works)
+- [ ] PR26: Results + micro-FVM (guest completes <90s, cohort variant enabled)
 
 ### **Social & Presence (PR21, 27)**
-- [x] PR21: Activity feed (refresh 5 min, load <100ms, PII-free) ✅
-- [x] PR27: Cohort rooms + leaderboards (P95 <2s, fairness rules enforced, opt-out works) ✅
+- [ ] PR21: Activity feed (refresh 5 min, load <100ms, PII-free)
+- [ ] PR27: Cohort rooms + leaderboards (P95 <2s, fairness rules enforced, opt-out works)
 
 ### **AI & Transcription (PR20)**
-- [x] PR20: Transcription + actions (transcript <10 min, summary <30s, ≥4 actions triggered, cost <$0.50) ✅
-- [x] PR20 Extension: Prep pack (generated for 3 session types, share flow functional) ✅
+- [ ] PR20: Transcription + actions (transcript <10 min, summary <30s, ≥4 actions triggered, cost <$0.50)
+- [ ] PR20 Extension: Prep pack (generated for 3 session types, share flow functional)
 
 ### **Trust & Safety (PR22)**
 - [ ] PR22: Fraud detection (anomaly scoring, captcha, review queue, abuse <0.5%)
 
 ### **Student/Parent/Tutor Loops (PR23, 30, 24)**
-- [x] PR23: Study Buddy (challenge created <500ms, cooldown 48h, analytics tracked) ✅
-- [ ] PR30: Parent-Child Challenge (Option A or B shipped, abuse thresholds enforced)
+- [ ] PR23: Study Buddy (challenge created <500ms, cooldown 48h, analytics tracked)
+- [ ] PR30: Second student loop (Option A or B shipped, abuse thresholds enforced)
 - [ ] PR24: Parent pod + tutor peer (deep links work, analytics tracked, fraud excluded)
 
 ### **Compliance (PR31)**
@@ -1622,9 +1519,7 @@ Each task includes:
 
 ---
 
-**Status:** ✅ Platinum-Complete, 100% Production-Ready, All PRs Deployed 🚀  
-**Project Name:** TutorAI (formerly MessageAI)  
-**Repository:** github.com/TURahim/TutorAI  
+**Status:** ✅ Platinum-Complete & Production-Ready  
 **Maintainers:** Engineer A (Backend), Engineer B (Frontend)  
-**Next Phase:** Scale & Monitor Production Metrics  
-**Version:** 2.1 (November 2025)
+**Next Review:** Week 2 Post-Integration Testing  
+**Version:** 2.0 (November 2025)

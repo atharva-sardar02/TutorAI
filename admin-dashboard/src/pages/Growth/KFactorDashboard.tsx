@@ -27,7 +27,7 @@ import type { DateRange, LoopType } from '@/types/metrics';
 
 export function KFactorDashboard() {
   const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: subDays(new Date(), 30),
+    startDate: subDays(new Date(), 7), // Changed from 30 to 7 days to show demo data by default
     endDate: new Date(),
   });
   const [loopType, setLoopType] = useState<LoopType>('all');
@@ -57,6 +57,9 @@ export function KFactorDashboard() {
     return <ErrorState message="No data available" />;
   }
 
+  // Check if we have any data to display
+  const hasData = data.byLoop.length > 0 || data.overall > 0;
+
   return (
     <Box>
       {/* Header */}
@@ -69,6 +72,7 @@ export function KFactorDashboard() {
           startIcon={<Download />}
           onClick={handleExport}
           size="small"
+          disabled={!hasData}
         >
           Export CSV
         </Button>
@@ -110,38 +114,49 @@ export function KFactorDashboard() {
         <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
           K-Factor by Loop Type
         </Typography>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Loop Type</strong></TableCell>
-                <TableCell align="right"><strong>K-Factor</strong></TableCell>
-                <TableCell align="right"><strong>Invites Sent</strong></TableCell>
-                <TableCell align="right"><strong>Conversions</strong></TableCell>
-                <TableCell align="right"><strong>Conversion Rate</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.byLoop.map((loop) => (
-                <TableRow key={loop.loopType} hover>
-                  <TableCell sx={{ textTransform: 'capitalize' }}>
-                    {loop.loopType.replace('_', ' ')}
-                  </TableCell>
-                  <TableCell align="right">
-                    <Chip
-                      label={loop.kFactor.toFixed(2)}
-                      size="small"
-                      color={loop.kFactor >= 1 ? 'success' : 'default'}
-                    />
-                  </TableCell>
-                  <TableCell align="right">{formatNumber(loop.invitesSent)}</TableCell>
-                  <TableCell align="right">{formatNumber(loop.conversions)}</TableCell>
-                  <TableCell align="right">{formatPercentage(loop.conversionRate)}</TableCell>
+        {hasData ? (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell><strong>Loop Type</strong></TableCell>
+                  <TableCell align="right"><strong>K-Factor</strong></TableCell>
+                  <TableCell align="right"><strong>Invites Sent</strong></TableCell>
+                  <TableCell align="right"><strong>Conversions</strong></TableCell>
+                  <TableCell align="right"><strong>Conversion Rate</strong></TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {data.byLoop.map((loop) => (
+                  <TableRow key={loop.loopType} hover>
+                    <TableCell sx={{ textTransform: 'capitalize' }}>
+                      {loop.loopType.replace('_', ' ')}
+                    </TableCell>
+                    <TableCell align="right">
+                      <Chip
+                        label={loop.kFactor.toFixed(2)}
+                        size="small"
+                        color={loop.kFactor >= 1 ? 'success' : 'default'}
+                      />
+                    </TableCell>
+                    <TableCell align="right">{formatNumber(loop.invitesSent)}</TableCell>
+                    <TableCell align="right">{formatNumber(loop.conversions)}</TableCell>
+                    <TableCell align="right">{formatPercentage(loop.conversionRate)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <Box sx={{ py: 4, textAlign: 'center' }}>
+            <Typography variant="body1" color="text.secondary">
+              No K-Factor data available for the selected filters.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Try adjusting your date range or loop type filter.
+            </Typography>
+          </Box>
+        )}
       </Paper>
     </Box>
   );

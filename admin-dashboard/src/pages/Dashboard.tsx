@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Typography, Paper, Box, List, ListItem, ListItemText, Chip } from '@mui/material';
-import { People, TrendingUp, Science, Security } from '@mui/icons-material';
+import { Grid, Typography, Paper, Box, List, ListItem, ListItemText, Chip, IconButton, Tooltip } from '@mui/material';
+import { People, TrendingUp, Science, Security, Refresh } from '@mui/icons-material';
 import { MetricCard } from '@/components/Cards/MetricCard';
 import { StatCard } from '@/components/Cards/StatCard';
 import { LoadingState } from '@/components/Common/LoadingState';
@@ -14,22 +14,32 @@ export function Dashboard() {
   const [recentActivity, setRecentActivity] = useState<ActivityLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
+
+  const loadStats = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getDashboardStats();
+      setStats(data);
+      setLastRefreshed(new Date());
+    } catch (err: any) {
+      setError(err.message || 'Failed to load dashboard data');
+      console.error('[Dashboard UI] Error loading stats:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadStats();
+  };
 
   useEffect(() => {
-    // Fetch dashboard stats
-    const loadStats = async () => {
-      try {
-        setLoading(true);
-        const data = await getDashboardStats();
-        setStats(data);
-        setError(null);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load dashboard data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    // Initial load
     loadStats();
 
     // Subscribe to recent activity
@@ -50,9 +60,32 @@ export function Dashboard() {
 
   return (
     <Box>
-      <Typography variant="h4" fontWeight={700} sx={{ mb: 3 }}>
-        Dashboard Overview
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4" fontWeight={700}>
+          Dashboard Overview
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="caption" color="text.secondary">
+            Last updated: {formatDistanceToNow(lastRefreshed, { addSuffix: true })}
+          </Typography>
+          <Tooltip title="Refresh dashboard">
+            <IconButton 
+              onClick={handleRefresh} 
+              disabled={refreshing}
+              color="primary"
+              size="small"
+            >
+              <Refresh sx={{ 
+                animation: refreshing ? 'spin 1s linear infinite' : 'none',
+                '@keyframes spin': {
+                  '0%': { transform: 'rotate(0deg)' },
+                  '100%': { transform: 'rotate(360deg)' },
+                },
+              }} />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Box>
 
       {/* Key Metrics */}
       <Grid container spacing={3} sx={{ mb: 4 }}>

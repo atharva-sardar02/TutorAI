@@ -15,6 +15,7 @@ export interface KFactorMetrics {
   }[];
   startDate: string;
   endDate: string;
+  isRealData?: boolean; // Flag to indicate if this is real data (true) or demo data (false)
 }
 
 export interface FunnelMetrics {

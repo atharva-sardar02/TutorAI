@@ -52,6 +52,32 @@ export interface SIAlert {
   metadata?: Record<string, any>;
 }
 
+/**
+ * Runtime validation helper for SIEvent
+ */
+export function isValidSIEvent(event: any): event is SIEvent {
+  return (
+    event &&
+    typeof event.id === 'string' &&
+    typeof event.eventType === 'string' &&
+    event.timestamp !== null &&
+    event.timestamp !== undefined
+  );
+}
+
+/**
+ * Runtime validation helper for SIAlert
+ */
+export function isValidSIAlert(alert: any): alert is SIAlert {
+  return (
+    alert &&
+    typeof alert.id === 'string' &&
+    typeof alert.message === 'string' &&
+    alert.timestamp !== null &&
+    alert.timestamp !== undefined
+  );
+}
+
 export interface SIAnalytics {
   events: SIEvent[];
   alerts: SIAlert[];

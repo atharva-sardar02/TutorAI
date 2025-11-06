@@ -10,29 +10,45 @@ export function formatDate(date: Date | string, formatStr: string = 'MMM d, yyyy
 
 /**
  * Format a number with thousands separators
+ * Safely handles undefined, null, and non-numeric values
  */
-export function formatNumber(num: number): string {
+export function formatNumber(num: number | undefined | null): string {
+  if (num === undefined || num === null || isNaN(num)) {
+    return '0';
+  }
   return num.toLocaleString('en-US');
 }
 
 /**
  * Format a percentage
+ * Safely handles undefined, null, and non-numeric values
  */
-export function formatPercentage(value: number, decimals: number = 1): string {
+export function formatPercentage(value: number | undefined | null, decimals: number = 1): string {
+  if (value === undefined || value === null || isNaN(value)) {
+    return '0.0%';
+  }
   return `${value.toFixed(decimals)}%`;
 }
 
 /**
  * Format a decimal as percentage (0.15 -> 15%)
+ * Safely handles undefined, null, and non-numeric values
  */
-export function formatDecimalAsPercentage(value: number, decimals: number = 1): string {
+export function formatDecimalAsPercentage(value: number | undefined | null, decimals: number = 1): string {
+  if (value === undefined || value === null || isNaN(value)) {
+    return '0.0%';
+  }
   return `${(value * 100).toFixed(decimals)}%`;
 }
 
 /**
  * Format a duration in days
+ * Safely handles undefined, null, and non-numeric values
  */
-export function formatDuration(days: number): string {
+export function formatDuration(days: number | undefined | null): string {
+  if (days === undefined || days === null || isNaN(days)) {
+    return '0 days';
+  }
   if (days < 1) return '< 1 day';
   if (days === 1) return '1 day';
   if (days < 7) return `${Math.round(days)} days`;
@@ -59,8 +75,12 @@ export function formatTimeBetween(startDate: Date | string, endDate: Date | stri
 
 /**
  * Format currency (if needed for rewards)
+ * Safely handles undefined, null, and non-numeric values
  */
-export function formatCurrency(amount: number, currency: string = 'USD'): string {
+export function formatCurrency(amount: number | undefined | null, currency: string = 'USD'): string {
+  if (amount === undefined || amount === null || isNaN(amount)) {
+    amount = 0;
+  }
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
@@ -69,8 +89,12 @@ export function formatCurrency(amount: number, currency: string = 'USD'): string
 
 /**
  * Format a large number with abbreviations (1000 -> 1K, 1000000 -> 1M)
+ * Safely handles undefined, null, and non-numeric values
  */
-export function formatCompactNumber(num: number): string {
+export function formatCompactNumber(num: number | undefined | null): string {
+  if (num === undefined || num === null || isNaN(num)) {
+    return '0';
+  }
   if (num < 1000) return num.toString();
   if (num < 1000000) return `${(num / 1000).toFixed(1)}K`;
   if (num < 1000000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -79,8 +103,9 @@ export function formatCompactNumber(num: number): string {
 
 /**
  * Format XP with badge
+ * Safely handles undefined, null, and non-numeric values
  */
-export function formatXP(xp: number): string {
+export function formatXP(xp: number | undefined | null): string {
   return `${formatNumber(xp)} XP`;
 }
 

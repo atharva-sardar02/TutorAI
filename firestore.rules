@@ -68,6 +68,9 @@ service cloud.firestore {
 
     // --- CONVERSATIONS COLLECTION ---
     match /conversations/{cid} {
+      // Admins can read all conversations
+      allow read: if isAdmin();
+      
       // Allow authenticated users with roles to read conversations (even if document doesn't exist)
       // This allows checking if conversation exists before creating
       allow get: if request.auth != null;
@@ -268,6 +271,9 @@ service cloud.firestore {
     // Viral growth referral tracking
     // Only Cloud Functions can write (server-side only)
     match /referrals/{referralId} {
+      // Admins can read all referrals
+      allow read: if isAdmin();
+      
       // Users can read referrals they created or received
       allow read: if request.auth != null && (
         request.auth.uid == resource.data.referrerId ||
@@ -322,6 +328,9 @@ service cloud.firestore {
     // --- BALANCES COLLECTION (PR25) ---
     // Aggregate user balances (XP, class passes, etc.)
     match /balances/{userId} {
+      // Admins can read all balances
+      allow read: if isAdmin();
+      
       // Users can read their own balance
       allow read: if request.auth != null && request.auth.uid == userId;
       

@@ -72,6 +72,28 @@ export function SIAnalytics() {
     }
   };
 
+  // Helper to safely format event type
+  const formatEventType = (eventType: string | undefined): string => {
+    if (!eventType) return 'Unknown';
+    return eventType.replace(/_/g, ' ');
+  };
+
+  // Helper to safely format alert type
+  const formatAlertType = (alertType: string | undefined): string => {
+    if (!alertType) return 'Unknown Alert';
+    return alertType.replace(/_/g, ' ').toUpperCase();
+  };
+
+  // Validate and filter events to ensure data integrity
+  const validEvents = (analytics.events || []).filter(event => 
+    event && event.id && event.timestamp
+  );
+
+  // Validate and filter alerts
+  const validAlerts = (analytics.alerts || []).filter(alert =>
+    alert && alert.id && alert.message && alert.timestamp
+  );
+
   return (
     <Box>
       {/* Header */}
@@ -112,21 +134,21 @@ export function SIAnalytics() {
       </Grid>
 
       {/* Alerts */}
-      {analytics.alerts.length > 0 && (
+      {validAlerts.length > 0 && (
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
             Active Alerts
           </Typography>
-          {analytics.alerts.map((alert) => (
+          {validAlerts.map((alert) => (
             <Alert
               key={alert.id}
-              severity={getSeverityColor(alert.severity) as any}
-              icon={getSeverityIcon(alert.severity)}
+              severity={getSeverityColor(alert.severity || 'info') as any}
+              icon={getSeverityIcon(alert.severity || 'low')}
               sx={{ mb: 1 }}
             >
-              <strong>{alert.alertType.replace(/_/g, ' ').toUpperCase()}:</strong> {alert.message}
+              <strong>{formatAlertType(alert.alertType)}:</strong> {alert.message || 'No message'}
               <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
-                {formatRelativeTime(alert.timestamp.toDate())}
+                {alert.timestamp ? formatRelativeTime(alert.timestamp.toDate()) : 'Recently'}
               </Typography>
             </Alert>
           ))}
@@ -150,38 +172,46 @@ export function SIAnalytics() {
         <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
           Recent Events
         </Typography>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Event Type</strong></TableCell>
-                <TableCell><strong>Conversation</strong></TableCell>
-                <TableCell align="right"><strong>Duration</strong></TableCell>
-                <TableCell align="right"><strong>Time</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {analytics.events.slice(0, 10).map((event) => (
-                <TableRow key={event.id} hover>
-                  <TableCell>
-                    <Chip
-                      label={event.eventType.replace(/_/g, ' ')}
-                      size="small"
-                      color={event.eventType === 'error' ? 'error' : 'default'}
-                    />
-                  </TableCell>
-                  <TableCell>{event.conversationId || '-'}</TableCell>
-                  <TableCell align="right">
-                    {event.durationMs ? `${(event.durationMs / 1000).toFixed(1)}s` : '-'}
-                  </TableCell>
-                  <TableCell align="right">
-                    {formatRelativeTime(event.timestamp.toDate())}
-                  </TableCell>
+        {validEvents.length > 0 ? (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell><strong>Event Type</strong></TableCell>
+                  <TableCell><strong>Conversation</strong></TableCell>
+                  <TableCell align="right"><strong>Duration</strong></TableCell>
+                  <TableCell align="right"><strong>Time</strong></TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {validEvents.slice(0, 10).map((event) => (
+                  <TableRow key={event.id} hover>
+                    <TableCell>
+                      <Chip
+                        label={formatEventType(event.eventType)}
+                        size="small"
+                        color={event.eventType === 'error' ? 'error' : 'default'}
+                      />
+                    </TableCell>
+                    <TableCell>{event.conversationId || '-'}</TableCell>
+                    <TableCell align="right">
+                      {event.durationMs ? `${(event.durationMs / 1000).toFixed(1)}s` : '-'}
+                    </TableCell>
+                    <TableCell align="right">
+                      {event.timestamp ? formatRelativeTime(event.timestamp.toDate()) : '-'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <Box sx={{ py: 4, textAlign: 'center' }}>
+            <Typography variant="body1" color="text.secondary">
+              No events recorded yet
+            </Typography>
+          </Box>
+        )}
       </Paper>
     </Box>
   );

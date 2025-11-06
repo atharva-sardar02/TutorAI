@@ -88,10 +88,10 @@ export function UserTable({ users, onViewProfile, onBan, onUnban }: UserTablePro
                 <TableCell>
                   <Box>
                     <Typography variant="caption" display="block">
-                      XP: {user.stats ? formatNumber(user.stats.xpBalance) : 0}
+                      XP: {formatNumber(user.stats?.xpBalance)}
                     </Typography>
                     <Typography variant="caption" display="block" color="text.secondary">
-                      {user.stats ? user.stats.totalSessions : 0} sessions
+                      {user.stats?.totalSessions || 0} sessions
                     </Typography>
                   </Box>
                 </TableCell>
@@ -104,7 +104,7 @@ export function UserTable({ users, onViewProfile, onBan, onUnban }: UserTablePro
                 </TableCell>
                 <TableCell>
                   <Typography variant="caption">
-                    {formatDate(user.createdAt.toDate())}
+                    {user.createdAt ? formatDate(user.createdAt.toDate()) : 'Unknown'}
                   </Typography>
                 </TableCell>
                 <TableCell align="right">

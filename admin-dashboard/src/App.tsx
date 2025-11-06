@@ -4,6 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import { ErrorBoundary } from './components/Common/ErrorBoundary';
 import Login from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { MainLayout } from './components/Layout/MainLayout';
@@ -177,7 +178,9 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MainLayout>
-                      <SIAnalytics />
+                      <ErrorBoundary>
+                        <SIAnalytics />
+                      </ErrorBoundary>
                     </MainLayout>
                   </ProtectedRoute>
                 }
@@ -227,7 +230,9 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MainLayout>
-                      <UserManagement />
+                      <ErrorBoundary>
+                        <UserManagement />
+                      </ErrorBoundary>
                     </MainLayout>
                   </ProtectedRoute>
                 }

@@ -52,3 +52,5 @@ ui-debug.log
 # Firebase config (firebaseConfig.ts now uses env vars, safe to commit)
 # **/firebaseConfig.ts (removed from gitignore)
 # **/firebaseConfig.js (removed from gitignore)
+
+*.env

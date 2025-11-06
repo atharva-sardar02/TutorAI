@@ -1,0 +1,15 @@
+{
+  "name": "tutorai-seeding-scripts",
+  "version": "1.0.0",
+  "description": "Test data seeding scripts for TutorAI",
+  "scripts": {
+    "seed": "node seed-test-data.js",
+    "seed:dev": "NODE_ENV=development node seed-test-data.js",
+    "seed:prod": "NODE_ENV=production node seed-test-data.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "uuid": "^9.0.1"
+  }
+}
+
